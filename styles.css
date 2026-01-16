@@ -31,6 +31,12 @@ html,body{height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,
    Splash (Fluid Upgrade)
    ========================= */
 
+/* =========================
+   Splash (Final + Ripple)
+   Uses your classes:
+   .splash, .splash-inner, .splash-title, .splash-sub, .splash.hidden
+   ========================= */
+
 .splash {
   position: fixed;
   inset: 0;
@@ -41,12 +47,8 @@ html,body{height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 
-  /* Depth + softness */
-  background:
-    radial-gradient(1000px 700px at 50% 40%,
-      rgba(255,255,255,0.08),
-      rgba(0,0,0,0.85) 55%,
-      rgba(0,0,0,0.95) 100%);
+  /* Fully opaque: never see landing page behind */
+  background: #000;
 
   opacity: 1;
   visibility: visible;
@@ -60,26 +62,28 @@ html,body{height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,
     visibility 520ms;
 }
 
-/* Ambient glow */
+/* Subtle ambient glow (doesn't reveal background) */
 .splash::before {
   content: "";
   position: absolute;
   inset: -40%;
   background:
-    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.08), transparent 55%),
-    radial-gradient(circle at 70% 60%, rgba(255,255,255,0.06), transparent 60%);
-  filter: blur(30px);
+    radial-gradient(circle at 35% 35%, rgba(255,255,255,0.07), transparent 55%),
+    radial-gradient(circle at 70% 60%, rgba(255,255,255,0.05), transparent 60%);
+  filter: blur(40px);
+  opacity: 0.85;
   animation: splashGlow 6s ease-in-out infinite;
   pointer-events: none;
 }
 
 @keyframes splashGlow {
-  0%, 100% { transform: translate(0,0) scale(1); opacity: .85; }
-  50% { transform: translate(12px,-10px) scale(1.05); opacity: 1; }
+  0%, 100% { transform: translate(0,0) scale(1); opacity: .75; }
+  50% { transform: translate(14px,-10px) scale(1.06); opacity: .95; }
 }
 
 /* Card */
 .splash-inner {
+  position: relative;
   text-align: center;
   display: grid;
   gap: 12px;
@@ -87,8 +91,9 @@ html,body{height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,
   border-radius: 18px;
 
   background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
   backdrop-filter: blur(12px);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+  box-shadow: 0 22px 70px rgba(0,0,0,0.55);
 
   animation: floaty 2.8s ease-in-out infinite;
 }
@@ -103,6 +108,7 @@ html,body{height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,
   font-size: clamp(28px, 5vw, 56px);
   letter-spacing: 0.18em;
   text-transform: uppercase;
+  line-height: 1.1;
 }
 
 .splash-sub {
@@ -112,16 +118,40 @@ html,body{height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,
   text-transform: uppercase;
 }
 
+/* Ripple element (inserted by JS) */
+.splash-ripple {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 0.35;
+  background: radial-gradient(circle, rgba(255,255,255,0.35), rgba(255,255,255,0) 60%);
+  animation: ripple 620ms ease-out forwards;
+}
+
+@keyframes ripple {
+  from {
+    transform: translate(-50%, -50%) scale(0.6);
+    opacity: 0.35;
+  }
+  to {
+    transform: translate(-50%, -50%) scale(22);
+    opacity: 0;
+  }
+}
+
 /* Exit */
 .splash.hidden {
   opacity: 0;
   visibility: hidden;
   transform: translateY(8px);
-  filter: blur(50px);
+  filter: blur(10px);
   pointer-events: none;
 }
 
-/* Reduced motion support */
+/* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .splash::before,
   .splash-inner {
@@ -132,6 +162,7 @@ html,body{height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,
     transition: opacity 240ms ease, visibility 240ms ease;
   }
 }
+
 
 
 /* =========================
