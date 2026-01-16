@@ -115,3 +115,41 @@ body {
   opacity: 0.7;
   max-width: 420px;
 }
+
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: black;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+.splash.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.splash-inner {
+  text-align: center;
+  animation: pulse 1.8s infinite;
+}
+
+.splash h1 {
+  font-size: clamp(28px, 6vw, 56px);
+  letter-spacing: 0.15em;
+}
+
+.splash p {
+  opacity: 0.7;
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
