@@ -83,6 +83,32 @@ splash.addEventListener("click", async (ev) => {
   await enter();
 });
 
+const nameEl = document.getElementById("floatingName");
+const nameBox = document.querySelector(".name-box");
+
+if (nameEl && nameBox) {
+  const MOVE_INTERVAL = 4000; 
+  const PADDING = 20;        
+
+  function moveName() {
+    const boxRect = nameBox.getBoundingClientRect();
+    const nameRect = nameEl.getBoundingClientRect();
+
+    const maxX = boxRect.width - nameRect.width - PADDING;
+    const maxY = boxRect.height - nameRect.height - PADDING;
+
+    const x = Math.random() * maxX + PADDING / 2;
+    const y = Math.random() * maxY + PADDING / 2;
+
+    nameEl.style.transform = `translate(${x}px, ${y}px)`;
+  }
+
+  moveName();
+
+  setInterval(moveName, MOVE_INTERVAL);
+}
+
+
 
 
   if (toggleMusicBtn && bgMusic) {
