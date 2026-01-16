@@ -294,20 +294,31 @@ html,body{height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,
 
 #floatingName{
   position: absolute;
+  display: inline-flex;
+  gap: 0.12em;             
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
 
   font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   font-weight: 900;
   font-size: clamp(40px, 7vw, 72px);
-  letter-spacing: 0.18em;
-
+  letter-spacing: 0.12em;
   color: #fff;
   opacity: 0.95;
-  white-space: nowrap;
 
-  pointer-events: none;
-  user-select: none;
-
-  transition: transform 1.6s ease-out;
   will-change: transform;
+  transition: transform 1.6s ease-out;
+}
+
+#floatingName .ch{
+  display: inline-block;
+  will-change: transform;
+  transform: translate3d(0,0,0);
+  transition: transform 900ms ease-out;
+}
+
+.name-box:hover #floatingName .ch{
+  transition: transform 700ms ease-out;
 }
 
