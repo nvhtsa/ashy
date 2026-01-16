@@ -220,7 +220,7 @@ document.addEventListener("DOMContentLoaded", () => {
   updateButtons();
 
   function initFX() {
-    if (window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches) return;
+   // if (window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches) return;
 
     const rainCanvas = document.getElementById("fxRain");
     const trailCanvas = document.getElementById("fxTrail");
