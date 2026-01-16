@@ -353,12 +353,13 @@ html,body{height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,
 .np-dot{ opacity: 0.6; }
 
 .np-seek{
-  width: 180px;
-  height: 2px;
+  width: 180px;                 
+  height: 6px;                  
   background: rgba(255,255,255,0.25);
   border-radius: 999px;
   -webkit-appearance: none;
   appearance: none;
+  outline: none;
   cursor: pointer;
 }
 
@@ -366,18 +367,24 @@ html,body{height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,
   background: rgba(255,255,255,0.4);
 }
 
+
 .np-seek::-webkit-slider-thumb{
   -webkit-appearance: none;
   appearance: none;
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   background: #fff;
+  transition: transform 0.15s ease;
+}
+
+.np-seek::-webkit-slider-thumb:hover{
+  transform: scale(1.15);
 }
 
 .np-seek::-moz-range-thumb{
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border: none;
   border-radius: 50%;
   background: #fff;
