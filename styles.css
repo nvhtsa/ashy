@@ -116,19 +116,26 @@ body {
   max-width: 420px;
 }
 
-.splash {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  background: black;
-  display: grid;
-  place-items: center;
-  cursor: pointer;
+/* --- FORCE SPLASH TO BE CLICKABLE + ON TOP --- */
+#splash {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 999999 !important;
+  pointer-events: auto !important;
 }
 
-.splash.hidden {
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.6s ease;
+/* Make sure video/overlay can never sit above splash */
+.bg-video,
+.overlay,
+.content {
+  z-index: 0 !important;
 }
+
+/* When hidden, splash must stop blocking */
+#splash.hidden {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
 
