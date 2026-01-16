@@ -1,37 +1,27 @@
 document.addEventListener("DOMContentLoaded", () => {
   const splash = document.getElementById("splash");
-  const page = document.getElementById("page");
   const bgVideo = document.getElementById("bgVideo");
   const bgMusic = document.getElementById("bgMusic");
 
-  if (!splash || !page || !bgVideo) {
-    console.log("Missing required elements:", { splash, page, bgVideo });
+  if (!splash) {
+    console.error('Missing #splash in HTML');
     return;
   }
 
-
-  page.classList.add("is-hidden");
-
-
-  bgVideo.muted = true;
-  bgVideo.pause();
-  if (bgMusic) bgMusic.pause();
-
   splash.addEventListener("click", async () => {
+    // UNSTICK: hide splash no matter what
+    splash.classList.add("hidden");
+    setTimeout(() => splash.remove(), 400);
 
-    splash.style.display = "none";
-
-
-    page.classList.remove("is-hidden");
-    page.classList.add("is-visible");
-
-
-    try {
+    // Start video
+    if (bgVideo) {
       bgVideo.muted = false;
-      await bgVideo.play();
-      if (bgMusic) await bgMusic.play();
-    } catch (e) {
-      console.log("Autoplay blocked:", e);
+      bgVideo.play().catch(console.log);
+    }
+
+    // Start music (optional)
+    if (bgMusic) {
+      bgMusic.play().catch(console.log);
     }
   });
 });
