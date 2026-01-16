@@ -376,3 +376,16 @@ html,body{height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,
   .np-meta{ min-width: 120px; }
 }
 
+.audio-stack{
+  display: grid;
+  gap: 8px;               
+  align-items: center;
+}
+
+@media (max-width: 520px){
+  .audio-stack{
+    gap: 6px;
+  }
+}
+
+
