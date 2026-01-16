@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const bgMusic = document.getElementById("bgMusic");
 
   const toggleVideoSoundBtn = document.getElementById("toggleVideoSound");
-  const toggleMusicBtn = document.getElementById("toggleMusic"); // optional (you don't have it in HTML now)
+  const toggleMusicBtn = document.getElementById("toggleMusic"); 
 
   const musicVolumeSlider = document.getElementById("musicVolume");
   const musicVolumeValue = document.getElementById("musicVolumeValue");
@@ -14,19 +14,19 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // Start hidden; we'll reveal after enter()
+
   document.querySelector(".content")?.classList.remove("visible");
 
   const DEFAULT_VOL = 0.3;
   let userEntered = false;
   let trackIndex = 0;
 
-  // Video always muted
+
   bgVideo.muted = true;
   bgVideo.volume = 0;
   bgVideo.play().catch(() => {});
 
-  // Volume helper (0..1)
+
   function setMusicVolume01(v01) {
     if (!bgMusic) return;
     const clamped = Math.max(0, Math.min(1, v01));
@@ -36,7 +36,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (musicVolumeValue) musicVolumeValue.textContent = `${Math.round(clamped * 100)}%`;
   }
 
-  // Default volume shown in UI even before playback
   if (bgMusic) {
     bgMusic.muted = false;
     setMusicVolume01(DEFAULT_VOL);
@@ -50,13 +49,11 @@ document.addEventListener("DOMContentLoaded", () => {
       toggleVideoSoundBtn.style.cursor = "not-allowed";
     }
 
-    // Optional legacy button (safe if absent)
     if (toggleMusicBtn && bgMusic) {
       toggleMusicBtn.textContent = bgMusic.paused ? "Play Music" : "Pause Music";
     }
   }
 
-  // --- Playlist / Now Playing ---
   const PLAYLIST = [
     { title: "TORN – Ramzoid", src: "assets/media/track1.mp3" },
     { title: "JUST TOUCHED DOWN – Westwood", src: "assets/media/track2.mp3" },
@@ -98,7 +95,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     updatePlayButton();
 
-    // Autoplay only after user enters (gesture rules)
     if (autoplay && userEntered) {
       bgMusic.play().catch((e) => console.log("Autoplay blocked:", e));
     }
@@ -107,7 +103,6 @@ document.addEventListener("DOMContentLoaded", () => {
   function nextTrack() { loadTrack(trackIndex + 1, true); }
   function prevTrack() { loadTrack(trackIndex - 1, true); }
 
-  // Keep UI updated
   if (bgMusic) {
     bgMusic.addEventListener("loadedmetadata", () => {
       if (npDur) npDur.textContent = fmtTime(bgMusic.duration);
@@ -122,11 +117,9 @@ document.addEventListener("DOMContentLoaded", () => {
     bgMusic.addEventListener("play", updatePlayButton);
     bgMusic.addEventListener("pause", updatePlayButton);
 
-    // Auto-advance
     bgMusic.addEventListener("ended", () => nextTrack());
   }
 
-  // Controls
   npPlay?.addEventListener("click", async () => {
     if (!bgMusic || !userEntered) return;
     try {
@@ -154,14 +147,12 @@ document.addEventListener("DOMContentLoaded", () => {
     bgMusic.currentTime = (Number(npSeek.value) / 100) * bgMusic.duration;
   });
 
-  // Volume slider
   if (musicVolumeSlider && bgMusic) {
     musicVolumeSlider.addEventListener("input", () => {
       setMusicVolume01(Number(musicVolumeSlider.value) / 100);
     });
   }
 
-  // Optional legacy toggle button (safe if element doesn't exist)
   if (toggleMusicBtn && bgMusic) {
     toggleMusicBtn.addEventListener("click", async () => {
       if (!userEntered) return;
@@ -176,24 +167,19 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Load first track (no autoplay yet)
   loadTrack(0, false);
 
-  // --- Enter (gesture) ---
   async function enter() {
     splash.classList.add("hidden");
     setTimeout(() => splash.remove(), 600);
-
-    // Reveal content AFTER entering
+    
     document.querySelector(".content")?.classList.add("visible");
 
     userEntered = true;
 
-    // Ensure video remains silent
     bgVideo.muted = true;
     bgVideo.volume = 0;
 
-    // Autoplay music immediately after entering (allowed by gesture)
     if (bgMusic) {
       try {
         setMusicVolume01(DEFAULT_VOL);
@@ -207,7 +193,6 @@ document.addEventListener("DOMContentLoaded", () => {
     updateButtons();
   }
 
-  // Click/tap to enter + ripple
   splash.addEventListener("click", async (ev) => {
     const r = document.createElement("span");
     r.className = "splash-ripple";
@@ -224,7 +209,6 @@ document.addEventListener("DOMContentLoaded", () => {
     await enter();
   });
 
-  // Keyboard enter/space on splash
   splash.addEventListener("keydown", (ev) => {
     if (ev.key === "Enter" || ev.key === " ") {
       ev.preventDefault();
