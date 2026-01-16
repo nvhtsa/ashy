@@ -80,27 +80,24 @@ document.addEventListener("DOMContentLoaded", () => {
     updateButtons();
   }
 
-  // Enter via click/tap
-  splash.addEventListener("click", enter);
-
-  // Enter via keyboard
-  splash.addEventListener("click", async (ev) => {
-  // --- Subtle click ripple ---
+ // Enter via click/tap (with subtle ripple)
+splash.addEventListener("click", async (ev) => {
+  // Create ripple
   const r = document.createElement("span");
   r.className = "splash-ripple";
 
-  // Position ripple at click/tap point
-  const x = ev.clientX ?? (ev.touches && ev.touches[0]?.clientX) ?? window.innerWidth / 2;
-  const y = ev.clientY ?? (ev.touches && ev.touches[0]?.clientY) ?? window.innerHeight / 2;
+  const x = ev.clientX ?? window.innerWidth / 2;
+  const y = ev.clientY ?? window.innerHeight / 2;
+
   r.style.left = `${x}px`;
   r.style.top = `${y}px`;
 
   splash.appendChild(r);
-  setTimeout(() => r.remove(), 700);
+  setTimeout(() => r.remove(), 600);
 
-  // Proceed to enter
   await enter();
 });
+
 
 
   // Toggle music button
