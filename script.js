@@ -3,10 +3,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const bgVideo = document.getElementById("bgVideo");
   const bgMusic = document.getElementById("bgMusic");
 
-  const toggleVideoSoundBtn = document.getElementById("toggleVideoSound");
+  const toggleVideoSoundBtn = document.getElementById("toggleVideoSound"); // optional
   const toggleMusicBtn = document.getElementById("toggleMusic");
 
+  // NEW: volume UI
+  const musicVolumeSlider = document.getElementById("musicVolume");
+  const musicVolumeValue = document.getElementById("musicVolumeValue");
 
+  // Safety
   if (!splash || !bgVideo) {
     console.warn("Missing splash or bgVideo element.");
     return;
@@ -17,12 +21,28 @@ document.addEventListener("DOMContentLoaded", () => {
      --------------------------- */
   bgVideo.muted = true;
   bgVideo.volume = 0;
-
-  // Try to ensure video is playing behind the splash (muted autoplay allowed).
   bgVideo.play().catch(() => {});
 
+  /* ---------------------------
+     MP3 DEFAULT VOLUME (30%)
+     --------------------------- */
+  const DEFAULT_VOL = 0.3;
+
+  function setMusicVolume01(v01) {
+    if (!bgMusic) return;
+    const clamped = Math.max(0, Math.min(1, v01));
+    bgMusic.volume = clamped;
+
+    // Update UI (0–100)
+    if (musicVolumeSlider) musicVolumeSlider.value = String(Math.round(clamped * 100));
+    if (musicVolumeValue) musicVolumeValue.textContent = `${Math.round(clamped * 100)}%`;
+  }
+
+  // Initialize slider/UI to 30%
+  if (bgMusic) setMusicVolume01(DEFAULT_VOL);
+
   function updateButtons() {
-    // Video audio is locked off, so hide/disable that button if it exists.
+    // Video audio locked off
     if (toggleVideoSoundBtn) {
       toggleVideoSoundBtn.textContent = "Video Muted";
       toggleVideoSoundBtn.disabled = true;
@@ -30,30 +50,29 @@ document.addEventListener("DOMContentLoaded", () => {
       toggleVideoSoundBtn.style.cursor = "not-allowed";
     }
 
-    // Music button reflects actual MP3 state
+    // Music state
     if (toggleMusicBtn && bgMusic) {
       toggleMusicBtn.textContent = bgMusic.paused ? "Play Music" : "Pause Music";
     }
   }
 
   async function enter() {
-
+    // Reveal site
     splash.classList.add("hidden");
     setTimeout(() => splash.remove(), 500);
 
-
+    // Keep video silent forever
     bgVideo.muted = true;
     bgVideo.volume = 0;
     bgVideo.play().catch(() => {});
 
-
+    // Start MP3 at 30% volume
     if (bgMusic) {
       try {
         bgMusic.muted = false;
-        if (bgMusic.volume === 0) bgMusic.volume = 1.0;
+        setMusicVolume01(DEFAULT_VOL);
         await bgMusic.play();
       } catch (e) {
-
         console.log("Music play blocked:", e);
       }
     }
@@ -61,10 +80,10 @@ document.addEventListener("DOMContentLoaded", () => {
     updateButtons();
   }
 
-  // Click / tap
+  // Enter via click/tap
   splash.addEventListener("click", enter);
 
-  // Keyboard accessibility: Enter/Space
+  // Enter via keyboard
   splash.addEventListener("keydown", (ev) => {
     if (ev.key === "Enter" || ev.key === " ") {
       ev.preventDefault();
@@ -72,12 +91,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // Toggle music button
   if (toggleMusicBtn && bgMusic) {
     toggleMusicBtn.addEventListener("click", async () => {
       try {
         if (bgMusic.paused) {
           bgMusic.muted = false;
-          if (bgMusic.volume === 0) bgMusic.volume = 1.0;
+          // Use current slider value if available, else default
+          const v = musicVolumeSlider ? Number(musicVolumeSlider.value) / 100 : DEFAULT_VOL;
+          setMusicVolume01(v);
           await bgMusic.play();
         } else {
           bgMusic.pause();
@@ -86,6 +108,14 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("Music toggle blocked:", e);
       }
       updateButtons();
+    });
+  }
+
+  // Volume slider (controls MP3 only)
+  if (musicVolumeSlider && bgMusic) {
+    musicVolumeSlider.addEventListener("input", () => {
+      const v01 = Number(musicVolumeSlider.value) / 100;
+      setMusicVolume01(v01);
     });
   }
 
