@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function enter() {
     // Reveal site
     splash.classList.add("hidden");
-    setTimeout(() => splash.remove(), 500);
+    setTimeout(() => splash.remove(), 600);
 
     // Keep video silent forever
     bgVideo.muted = true;
