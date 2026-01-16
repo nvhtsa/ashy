@@ -6,7 +6,7 @@ html,body{height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1}
 
 .fx-canvas{ position:fixed; inset:0; z-index:2; pointer-events:none; }
-#fxRain{ opacity:0.22; }
+#fxRain{ opacity:0.45; }
 #fxTrail{ opacity:0.75; }
 
 .content{position:relative;z-index:3;min-height:100vh;display:grid;place-items:center;gap:18px;padding:32px 16px;text-align:center}
