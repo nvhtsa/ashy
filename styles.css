@@ -279,3 +279,39 @@ html,body{height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,
   }
 }
 
+
+.name-box {
+  position: relative;
+  width: 420px;          
+  height: 160px;
+  max-width: 90vw;
+
+  border-radius: 16px;
+  overflow: hidden;      
+
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
+}
+
+#floatingName {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 900;                
+  font-size: clamp(36px, 6vw, 64px);
+  letter-spacing: 0.18em;
+
+  color: #ffffff;
+  opacity: 0.95;
+  white-space: nowrap;
+
+  pointer-events: none;             
+  user-select: none;
+
+  transition: transform 6s ease-in-out;
+}
+
+
