@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const bgMusic = document.getElementById("bgMusic");
 
   const toggleVideoSoundBtn = document.getElementById("toggleVideoSound");
-  const toggleMusicBtn = document.getElementById("toggleMusic"); 
+  const toggleMusicBtn = document.getElementById("toggleMusic");
 
   const musicVolumeSlider = document.getElementById("musicVolume");
   const musicVolumeValue = document.getElementById("musicVolumeValue");
@@ -14,18 +14,15 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-
   document.querySelector(".content")?.classList.remove("visible");
 
   const DEFAULT_VOL = 0.3;
   let userEntered = false;
   let trackIndex = 0;
 
-
   bgVideo.muted = true;
   bgVideo.volume = 0;
   bgVideo.play().catch(() => {});
-
 
   function setMusicVolume01(v01) {
     if (!bgMusic) return;
@@ -62,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const npTitle = document.getElementById("npTitle");
   const npTime = document.getElementById("npTime");
-  const npDur  = document.getElementById("npDur");
+  const npDur = document.getElementById("npDur");
   const npSeek = document.getElementById("npSeek");
   const npPlay = document.getElementById("npPlay");
   const npPrev = document.getElementById("npPrev");
@@ -91,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (npTitle) npTitle.textContent = PLAYLIST[trackIndex].title;
     if (npSeek) npSeek.value = "0";
     if (npTime) npTime.textContent = "0:00";
-    if (npDur)  npDur.textContent = "0:00";
+    if (npDur) npDur.textContent = "0:00";
 
     updatePlayButton();
 
@@ -100,8 +97,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function nextTrack() { loadTrack(trackIndex + 1, true); }
-  function prevTrack() { loadTrack(trackIndex - 1, true); }
+  function nextTrack() {
+    loadTrack(trackIndex + 1, true);
+  }
+  function prevTrack() {
+    loadTrack(trackIndex - 1, true);
+  }
 
   if (bgMusic) {
     bgMusic.addEventListener("loadedmetadata", () => {
@@ -172,7 +173,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function enter() {
     splash.classList.add("hidden");
     setTimeout(() => splash.remove(), 600);
-    
+
     document.querySelector(".content")?.classList.add("visible");
 
     userEntered = true;
@@ -217,4 +218,175 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   updateButtons();
+
+  function initFX() {
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches) return;
+
+    const rainCanvas = document.getElementById("fxRain");
+    const trailCanvas = document.getElementById("fxTrail");
+    if (!rainCanvas || !trailCanvas) {
+      console.warn("FX canvases not found. Add: <canvas id='fxRain'> and <canvas id='fxTrail'>");
+      return;
+    }
+
+    const rctx = rainCanvas.getContext("2d", { alpha: true });
+    const tctx = trailCanvas.getContext("2d", { alpha: true });
+    if (!rctx || !tctx) return;
+
+    const DPR = Math.min(2, window.devicePixelRatio || 1);
+
+    function resize() {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+
+      for (const c of [rainCanvas, trailCanvas]) {
+        c.width = Math.floor(w * DPR);
+        c.height = Math.floor(h * DPR);
+        c.style.width = w + "px";
+        c.style.height = h + "px";
+      }
+
+      rctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      tctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    }
+    window.addEventListener("resize", resize, { passive: true });
+    resize();
+
+    const rand = (min, max) => Math.random() * (max - min) + min;
+
+    const TRAIL_INNER = { r: 210, g: 235, b: 255 }; 
+    const TRAIL_EDGE = { r: 205, g: 175, b: 255 };  
+
+    const trail = [];
+    const MAX_TRAIL = 34;         
+    const TRAIL_ALPHA = 0.22;      
+    const FADE_SPEED = 0.045;    
+
+    let lastX = window.innerWidth / 2;
+    let lastY = window.innerHeight / 2;
+    let lastT = performance.now();
+
+    const drops = [];
+    const DROP_COUNT = 170;   
+    const SPEED_MIN = 6;
+    const SPEED_MAX = 14;
+    const LEN_MIN = 9;
+    const LEN_MAX = 20;
+
+    let wind = 0.35;             
+    let windTarget = 0.35;         
+    const WIND_BASE = 0.35;
+    const WIND_MAX = 3.0;           
+
+    function initDrops() {
+      drops.length = 0;
+      for (let i = 0; i < DROP_COUNT; i++) {
+        drops.push({
+          x: rand(0, window.innerWidth),
+          y: rand(0, window.innerHeight),
+          v: rand(SPEED_MIN, SPEED_MAX),
+          l: rand(LEN_MIN, LEN_MAX),
+          a: rand(0.10, 0.26),
+        });
+      }
+    }
+    initDrops();
+
+    window.addEventListener(
+      "pointermove",
+      (e) => {
+        const now = performance.now();
+        const x = e.clientX;
+        const y = e.clientY;
+
+        const dt = Math.max(8, now - lastT);
+        const vx = (x - lastX) / dt; 
+
+        windTarget = WIND_BASE + vx * 18;
+        windTarget = Math.max(-WIND_MAX, Math.min(WIND_MAX, windTarget));
+
+        lastX = x;
+        lastY = y;
+        lastT = now;
+
+        trail.push({
+          x,
+          y,
+          r: rand(10, 18),
+          a: TRAIL_ALPHA,
+          life: 1.0,
+        });
+        while (trail.length > MAX_TRAIL) trail.shift();
+      },
+      { passive: true }
+    );
+
+    function drawRain() {
+      rctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+      wind += (windTarget - wind) * 0.08;
+
+      rctx.lineWidth = 1;
+      rctx.lineCap = "round";
+
+      for (const d of drops) {
+        
+        const dx = wind * d.l;
+
+        rctx.strokeStyle = `rgba(255,255,255,${d.a})`;
+        rctx.beginPath();
+        rctx.moveTo(d.x, d.y);
+        rctx.lineTo(d.x + dx, d.y + d.l);
+        rctx.stroke();
+
+        d.x += wind * (d.v * 0.32);
+        d.y += d.v;
+
+        if (d.y > window.innerHeight + 30) {
+          d.y = -30;
+          d.x = rand(-40, window.innerWidth + 40);
+        }
+        if (d.x > window.innerWidth + 60) d.x = -60;
+        if (d.x < -60) d.x = window.innerWidth + 60;
+      }
+    }
+
+    function drawTrail() {
+      tctx.globalCompositeOperation = "destination-out";
+      tctx.fillStyle = "rgba(0,0,0,0.10)";
+      tctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+      tctx.globalCompositeOperation = "source-over";
+
+      for (let i = trail.length - 1; i >= 0; i--) {
+        const p = trail[i];
+        p.life -= FADE_SPEED;
+        if (p.life <= 0) {
+          trail.splice(i, 1);
+          continue;
+        }
+
+        const alpha = p.a * p.life;
+        const radius = p.r * (0.75 + 0.25 * p.life);
+
+        const g = tctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, radius);
+        g.addColorStop(0, `rgba(${TRAIL_INNER.r},${TRAIL_INNER.g},${TRAIL_INNER.b},${alpha})`);
+        g.addColorStop(0.55, `rgba(${TRAIL_EDGE.r},${TRAIL_EDGE.g},${TRAIL_EDGE.b},${alpha * 0.65})`);
+        g.addColorStop(1, "rgba(255,255,255,0)");
+
+        tctx.fillStyle = g;
+        tctx.beginPath();
+        tctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+        tctx.fill();
+      }
+    }
+
+    function loop() {
+      drawRain();
+      drawTrail();
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+  }
+
+  initFX();
 });
