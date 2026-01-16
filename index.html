@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ashy.lol</title>
+  <link rel="icon" href="assets/img/favicon.ico" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Splash (click to enable sound + enter) -->
+  <div id="splash" class="splash" role="button" aria-label="Click to enter" tabindex="0">
+    <div class="splash-inner">
+      <div class="splash-title">CLICK TO ENTER</div>
+      <div class="splash-sub">Sound on • Tap / Click</div>
+    </div>
+  </div>
+
+  <!-- Background video (autoplays muted; unmuted after enter) -->
+  <video id="bgVideo" class="bg-video" autoplay muted loop playsinline preload="auto">
+    <source src="assets/media/background.mp4" type="video/mp4" />
+  </video>
+
+  <!-- Contrast overlay for readability -->
+  <div class="overlay" aria-hidden="true"></div>
+
+  <!-- Landing content -->
+  <main id="page" class="content" aria-label="Landing page">
+    <img class="logo" src="assets/img/logo.png" alt="Logo" />
+
+    <nav class="links" aria-label="Social links">
+      <a class="link" href="https://twitch.tv/YOURNAME" target="_blank" rel="noreferrer">
+        <img src="assets/icons/twitch.svg" alt="" />
+        <span>Twitch</span>
+      </a>
+      <span class="pipe">|</span>
+      <a class="link" href="https://youtube.com/@YOURNAME" target="_blank" rel="noreferrer">
+        <img src="assets/icons/youtube.svg" alt="" />
+        <span>YouTube</span>
+      </a>
+      <span class="pipe">|</span>
+      <a class="link" href="https://tiktok.com/@YOURNAME" target="_blank" rel="noreferrer">
+        <img src="assets/icons/tiktok.svg" alt="" />
+        <span>TikTok</span>
+      </a>
+      <span class="pipe">|</span>
+      <a class="link" href="https://x.com/YOURNAME" target="_blank" rel="noreferrer">
+        <img src="assets/icons/x.svg" alt="" />
+        <span>X</span>
+      </a>
+      <span class="pipe">|</span>
+      <a class="link" href="https://soundcloud.com/YOURNAME" target="_blank" rel="noreferrer">
+        <img src="assets/icons/soundcloud.svg" alt="" />
+        <span>SoundCloud</span>
+      </a>
+      <span class="pipe">|</span>
+      <a class="link" href="mailto:you@email.com">
+        <img src="assets/icons/mail.svg" alt="" />
+        <span>Contact</span>
+      </a>
+    </nav>
+
+    <!-- Optional controls (still useful if a browser blocks sound) -->
+    <div class="controls">
+      <button id="toggleVideoSound" class="btn" type="button">Unmute Video</button>
+      <button id="toggleMusic" class="btn" type="button">Play Music</button>
+    </div>
+
+    <audio id="bgMusic" loop preload="auto">
+      <source src="assets/media/music.mp3" type="audio/mpeg" />
+    </audio>
+
+    <div class="hint">If music doesn’t start, click “Play Music” once more (browser audio rules).</div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
