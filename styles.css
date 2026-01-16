@@ -22,15 +22,20 @@ html,body{height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,
 }
 
 .logo{
-  width:140px;
-  height:140px;
+  width: min(420px, 82vw);   
+  height: auto;             
+  max-height: 120px;        
 
-  object-fit: cover;    
+  object-fit: contain;
   object-position: center;
 
-  border-radius:999px;
-  box-shadow: 0 10px 40px rgba(0,0,0,.4);
+  border-radius: 0; 
+  box-shadow: 0 12px 50px rgba(0,0,0,0.55);
+
+  user-select: none;
+  pointer-events: none;    
 }
+
 
 .links{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;padding:10px 14px;border-radius:16px;background:rgba(0,0,0,.28);backdrop-filter:blur(8px)}
 .pipe{opacity:.6;user-select:none}
