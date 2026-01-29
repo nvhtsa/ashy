@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ASHTYN</title>
+  <link rel="icon" href="assets/img/favicon.ico" />
+  <link rel="stylesheet" href="styles.css" />
+  
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="ASHTYN" />
+  <meta property="og:description" content="who am i" />
+  <meta property="og:url" content="https://ashy.lol" />
+  <meta property="og:image" content="https://ashy.lol/assets/img/embed.png" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="ASHTYN" />
+  <meta name="twitter:description" content="who am i" />
+  <meta name="twitter:image" content="https://ashy.lol/assets/img/embed.png" />
+
+</head>
+<body>
+
+  <div id="splash" class="splash" tabindex="0" role="button" aria-label="Click to enter">
+    <div class="splash-inner">
+      <div class="splash-title">click2enter</div>
+      <div class="splash-sub"></div>
+    </div>
+  </div>
+
+  <!-- binx <3 -->
+
+  <video
+    id="bgVideo"
+    class="bg-video"
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="auto"
+  >
+    <source src="assets/media/background.mp4" type="video/mp4" />
+  </video>
+
+<div class="overlay" aria-hidden="true"></div>
+
+<canvas id="fxRain" class="fx-canvas" aria-hidden="true"></canvas>
+<canvas id="fxTrail" class="fx-canvas" aria-hidden="true"></canvas>
+
+<main id="page" class="content" aria-label="Landing page">
+    <img class="logo" src="assets/img/logo.png" alt="Logo" />
+
+    <nav class="links" aria-label="Social links">
+      <a class="link" href="https://twitch.tv/suckers" target="_blank" rel="noreferrer">
+        <img src="assets/icons/twitch.svg" alt="" />
+        <span>Twitch</span>
+      </a>
+      <span class="pipe">|</span>
+      <a class="link" href="https://youtube.com/@thrashas" target="_blank" rel="noreferrer">
+        <img src="assets/icons/youtube.svg" alt="" />
+        <span>YouTube</span>
+      </a>
+      <span class="pipe">|</span>
+      <a class="link" href="https://tiktok.com/@disaster" target="_blank" rel="noreferrer">
+        <img src="assets/icons/tiktok.svg" alt="" />
+        <span>TikTok</span>
+      </a>
+      <span class="pipe">|</span>
+      <a class="link" href="https://x.com/ashtynfps" target="_blank" rel="noreferrer">
+        <img src="assets/icons/x.svg" alt="" />
+        <span>X</span>
+      </a>
+      <span class="pipe">|</span>
+      <a class="link" href="https://soundcloud.com/ashy" target="_blank" rel="noreferrer">
+        <img src="assets/icons/soundcloud.svg" alt="" />
+        <span>SoundCloud</span>
+      </a>
+      <span class="pipe">|</span>
+      <a class="link" href="https://discord.gg/fkcafKxCzR" target="_blank" rel="noreferrer">
+        <img src="assets/icons/discord.svg" alt="" />
+        <span>Discord</span>
+      </a>
+    </nav>
+
+    <div class="audio-stack">
+
+      <div class="nowplaying" id="nowplaying" aria-label="Now playing">
+        <button class="np-btn" id="npPrev" type="button" aria-label="Previous track">←</button>
+        <button class="np-btn" id="npPlay" type="button" aria-label="Play/Pause">▶</button>
+        <button class="np-btn" id="npNext" type="button" aria-label="Next track">→</button>
+
+        <div class="np-meta">
+          <div class="np-title" id="npTitle">Not playing</div>
+          <div class="np-sub">
+            <span id="npTime">0:00</span>
+            <span class="np-dot">•</span>
+            <span id="npDur">0:00</span>
+          </div>
+        </div>
+
+        <input
+          id="npSeek"
+          class="np-seek"
+          type="range"
+          min="0"
+          max="100"
+          value="0"
+          step="1"
+          aria-label="Seek"
+        />
+      </div>
+
+      <div class="audio-controls">
+        <label class="vol-label" for="musicVolume">volume</label>
+        <input
+          id="musicVolume"
+          type="range"
+          min="0"
+          max="100"
+          value="30"
+          step="1"
+        />
+        <span id="musicVolumeValue">30%</span>
+      </div>
+
+    </div>
+  </main>
+
+  <audio id="bgMusic" preload="auto"></audio>
+
+  <script src="script.js"></script>
+</body>
+</html>
