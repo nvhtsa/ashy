@@ -52,6 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const PLAYLIST = [
+    { title: "115 - Kevin Sherwood & Elena Siegman", src: "assets/media/track6.mp3" },
     { title: "TORN – Ramzoid", src: "assets/media/track1.mp3" },
     { title: "JUST TOUCHED DOWN – Westwood", src: "assets/media/track2.mp3" },
     { title: "LIVING IN MY HEAD – Friz", src: "assets/media/track3.mp3" },
