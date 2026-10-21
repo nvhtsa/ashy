@@ -4,7 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ASHTYN</title>
-  <link rel="icon" href="assets/img/favicon.ico" />
+  <link rel="icon" href="assets/img/favicon.ico?v=2" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png?v=2" />
+  <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png?v=2" />
+  <meta name="theme-color" content="#0c0914" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&display=swap" rel="stylesheet" />
@@ -33,10 +36,10 @@
   <div id="app" class="app">
     <header class="top">
       <nav aria-label="Pages">
-        <a href="#home">Home</a>
-        <a href="#gear">Gear</a>
-        <a href="#settings">Settings</a>
-        <a href="#listening">Listening</a>
+        <a href="/">Home</a>
+        <a href="/gear">Gear</a>
+        <a href="/settings">Settings</a>
+        <a href="/listening">Listening</a>
       </nav>
     </header>
 
@@ -48,13 +51,13 @@
 
       <section data-view="gear" hidden>
         <h1>Gear</h1>
-        <p class="lede">My Current PC Specs.</p>
+        <p class="lede">What I play and stream on.</p>
         <div id="gearList" class="gear"></div>
       </section>
 
       <section data-view="settings" hidden>
         <h1>Settings</h1>
-        <p class="lede">My Counter-Strike 2 settings.</p>
+        <p class="lede">My in-game settings.</p>
         <div id="settingsList" class="gear"></div>
       </section>
 
@@ -66,13 +69,17 @@
       </section>
     </main>
 
-    <a class="mark" href="#home" aria-label="Back to home">ashtyn</a>
+    <a class="mark" href="/" aria-label="Back to home">ashtyn</a>
 
     <footer class="player" aria-label="Music player">
+      <div id="pQueue" class="queue" role="list" aria-label="Tracklist"></div>
       <button id="pPrev" aria-label="Previous track">&#8592;</button>
       <button id="pPlay" aria-label="Play or pause">&#9654;</button>
       <button id="pNext" aria-label="Next track">&#8594;</button>
       <div class="pmeta"><span id="pTitle">Not playing</span><input id="pSeek" type="range" min="0" max="100" value="0" aria-label="Seek" /></div>
+      <button id="pList" aria-label="Show tracklist" aria-expanded="false" aria-controls="pQueue">
+        <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 8 5.5l5 5"/></svg>
+      </button>
       <input id="pVol" type="range" min="0" max="100" value="15" aria-label="Volume" />
     </footer>
   </div>
