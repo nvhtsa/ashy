@@ -112,6 +112,31 @@ input[type=range]{-webkit-appearance:none;appearance:none;height:4px;border-radi
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--violet)}
 input[type=range]::-moz-range-thumb{width:12px;height:12px;border:0;border-radius:50%;background:var(--violet)}
 #pVol{width:80px;flex:none}
+#pList svg{display:block;margin:auto;transition:transform .3s var(--ease)}
+.player.open #pList{border-color:var(--violet);background:rgba(167,139,250,.16)}
+.player.open #pList svg{transform:rotate(180deg)}
+
+.queue{position:absolute;left:0;right:0;bottom:calc(100% + 10px);max-height:min(50vh,360px);overflow:auto;padding:8px;
+  border:1px solid var(--line);border-radius:16px;background:rgba(21,16,31,.92);backdrop-filter:blur(12px);
+  opacity:0;visibility:hidden;transform:translateY(12px) scale(.98);transform-origin:bottom center;
+  transition:opacity .22s ease,transform .3s var(--ease),visibility .3s}
+.player.open .queue{opacity:1;visibility:visible;transform:none}
+.player .queue button{display:flex;align-items:center;gap:14px;width:100%;height:auto;padding:11px 14px;border:0;
+  border-radius:10px;background:transparent;color:var(--muted);text-align:left;
+  transition:background .15s,color .15s,transform .15s}
+.player .queue button:hover{background:rgba(167,139,250,.14);color:var(--text);transform:translateX(3px);border-color:transparent}
+.player .queue button[aria-current="true"]{color:var(--text);background:rgba(167,139,250,.22)}
+.queue .n{width:18px;text-align:center;font-variant-numeric:tabular-nums;opacity:.6;flex:none}
+.queue .t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.queue .eq{display:none;width:18px;height:14px;align-items:flex-end;justify-content:center;gap:2px;flex:none}
+.queue [aria-current="true"] .eq{display:flex}
+.queue [aria-current="true"] .n{display:none}
+.eq i{width:3px;height:100%;border-radius:2px;background:var(--violet);transform-origin:bottom;
+  animation:eq 1s ease-in-out infinite;animation-play-state:paused}
+.player.playing .eq i{animation-play-state:running}
+.eq i:nth-child(2){animation-delay:-.4s}
+.eq i:nth-child(3){animation-delay:-.7s}
+@keyframes eq{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
 
 @media (max-width:560px){
   .mark{bottom:84px;right:18px}
