@@ -4,6 +4,7 @@
     const n = Object.assign(document.createElement(tag), props); n.append(...kids); return n;
   };
 
+
   C.socials.forEach((s) => $("#socials").append(
     el("a", { href: s.url, target: "_blank", rel: "noreferrer noopener" },
       el("img", { src: `assets/icons/${s.icon}.svg`, alt: "" }), s.name)));
@@ -26,18 +27,38 @@
   cards($("#gearList"), C.gear);
   cards($("#settingsList"), C.settings || []);
 
+
   const views = [...document.querySelectorAll("[data-view]")].filter((v) => v.tagName === "SECTION");
   const tabs = [...document.querySelectorAll("nav a")];
   const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   const replay = (node) => { node.classList.remove("enter"); void node.offsetWidth; node.classList.add("enter"); };
+  const PAGE_NAMES = new Set(["gear", "settings", "listening"]);
+  const pathFor = (page) => page === "home" ? "/" : `/${page}`;
+  const pageFromLocation = () => {
+    const last = location.pathname.split("/").filter(Boolean).pop() || "home";
+    return PAGE_NAMES.has(last) ? last : "home";
+  };
   let routeId = 0;
+  const TITLES = { home: "ASHTYN", gear: "Gear | ASHTYN", settings: "Settings | ASHTYN", listening: "Listening | ASHTYN" };
+
+  const fallbackPath = new URLSearchParams(location.search).get("p");
+  if (fallbackPath && /^\/(gear|settings|listening)\/?$/.test(fallbackPath)) {
+    history.replaceState(null, "", fallbackPath.replace(/\/$/, ""));
+  } else if (location.hash) {
+    const legacyPage = location.hash.slice(1);
+    if (legacyPage === "home" || PAGE_NAMES.has(legacyPage)) {
+      history.replaceState(null, "", pathFor(legacyPage));
+    }
+  }
+
   async function route(animate) {
     const id = ++routeId;
-    const h = (location.hash || "#home").slice(1);
-    const v = views.some((x) => x.dataset.view === h) ? h : "home";
-    tabs.forEach((a) => a.setAttribute("aria-current", a.hash === "#" + v ? "page" : "false"));
+    const v = pageFromLocation();
+    tabs.forEach((a) => a.setAttribute("aria-current",
+      (a.pathname.replace(/\/$/, "") || "/") === pathFor(v) ? "page" : "false"));
     document.body.dataset.view = v;
+    document.title = TITLES[v] || "ASHTYN";
     const cur = views.find((x) => !x.hidden);
     if (cur && cur.dataset.view === v) { cur.classList.remove("leaving"); return; }
     if (cur && animate && !calm) {
@@ -49,7 +70,27 @@
     views.forEach((x) => (x.hidden = x.dataset.view !== v));
     if (animate) replay(views.find((x) => x.dataset.view === v));
   }
-  addEventListener("hashchange", () => route(true)); route(false);
+
+  tabs.forEach((a) => a.addEventListener("click", (e) => {
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    const page = a.pathname.split("/").filter(Boolean).pop() || "home";
+    if (page !== pageFromLocation()) {
+      history.pushState(null, "", pathFor(PAGE_NAMES.has(page) ? page : "home"));
+      route(true);
+    }
+  }));
+  const homeMark = document.querySelector(".mark");
+  if (homeMark) homeMark.addEventListener("click", (e) => {
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    if (pageFromLocation() !== "home") {
+      history.pushState(null, "", "/");
+      route(true);
+    }
+  });
+  addEventListener("popstate", () => route(true));
+  route(false);
 
   const audio = $("#audio"), title = $("#pTitle"), playBtn = $("#pPlay"), seek = $("#pSeek"), vol = $("#pVol");
   let i = 0, actx = null, analyser = null, gain = null, freq = null;
@@ -83,16 +124,33 @@
   function load(n, play) {
     i = (n + C.playlist.length) % C.playlist.length;
     audio.src = C.playlist[i].src; title.textContent = C.playlist[i].title; seek.value = 0;
+    mark();
     if (play) startMusic();
   }
   playBtn.onclick = () => { if (audio.paused) startMusic(); else { unbind(); audio.pause(); } };
   $("#pNext").onclick = () => load(i + 1, true);
   $("#pPrev").onclick = () => load(i - 1, true);
-  audio.onplay = audio.onpause = () => (playBtn.innerHTML = audio.paused ? "&#9654;" : "&#10074;&#10074;");
+  audio.onplay = audio.onpause = () => {
+    playBtn.innerHTML = audio.paused ? "&#9654;" : "&#10074;&#10074;";
+    playerEl.classList.toggle("playing", !audio.paused);
+  };
   audio.onended = () => load(i + 1, true);
   audio.ontimeupdate = () => { if (audio.duration) seek.value = (audio.currentTime / audio.duration) * 100; };
   seek.oninput = () => { if (audio.duration) audio.currentTime = (seek.value / 100) * audio.duration; };
+
+  const playerEl = document.querySelector(".player"), queue = $("#pQueue"), listBtn = $("#pList");
+  C.playlist.forEach((t, n) => queue.append(el("button", { type: "button", onclick: () => load(n, true) },
+    el("span", { className: "n", textContent: String(n + 1) }),
+    el("span", { className: "eq" }, el("i"), el("i"), el("i")),
+    el("span", { className: "t", textContent: t.title }))));
+  function mark() { [...queue.children].forEach((b, n) => b.setAttribute("aria-current", n === i ? "true" : "false")); }
+  const setOpen = (o) => { playerEl.classList.toggle("open", o); listBtn.setAttribute("aria-expanded", String(o)); };
+  listBtn.onclick = () => setOpen(!playerEl.classList.contains("open"));
+  addEventListener("keydown", (e) => { if (e.key === "Escape") setOpen(false); });
+  addEventListener("pointerdown", (e) => { if (!e.target.closest(".player")) setOpen(false); });
+
   load(Math.floor(Math.random() * C.playlist.length), true); // random track on every page load
+
 
   const logo = document.querySelector(".logo");
   let avg = 0, lastHit = 0;
@@ -122,6 +180,7 @@
     requestAnimationFrame(analyse);
   }
   requestAnimationFrame(analyse);
+
 
   const { user, apiKey } = C.lastfm;
   const ago = (uts) => {
@@ -158,6 +217,7 @@
     } catch (e) { show(null, "Couldn't reach Last.fm. Check the username and API key in config.js."); return false; }
   }
   poll(); setInterval(poll, 20000);
+
 
   function initIntro(canvas, still) {
     const ctx = canvas.getContext("2d"), DPR = Math.min(2, devicePixelRatio || 1);
