@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ASHTYN</title>
+  <link rel="icon" href="assets/img/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="ASHTYN" />
+  <meta property="og:description" content="who am i" />
+  <meta property="og:url" content="https://ashy.lol" />
+  <meta property="og:image" content="https://ashy.lol/assets/img/embed.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="ASHTYN" />
+  <meta name="twitter:description" content="who am i" />
+  <meta name="twitter:image" content="https://ashy.lol/assets/img/embed.png" />
+</head>
+<body data-view="home">
+  <button id="splash" class="splash" aria-label="Enter site"><canvas id="intro" aria-hidden="true"></canvas>
+    <span class="cue" aria-hidden="true"><i class="ring"></i><b>enter</b></span></button>
+
+  <video class="bg-video" autoplay muted loop playsinline preload="auto">
+    <source src="assets/media/background.mp4" type="video/mp4" />
+  </video>
+  <div class="overlay" aria-hidden="true"></div>
+
+  <canvas id="bgOrbs" class="fx" aria-hidden="true"></canvas>
+
+  <div id="app" class="app">
+    <header class="top">
+      <nav aria-label="Pages">
+        <a href="#home">Home</a>
+        <a href="#gear">Gear</a>
+        <a href="#settings">Settings</a>
+        <a href="#listening">Listening</a>
+      </nav>
+    </header>
+
+    <main>
+      <section data-view="home" class="home">
+        <img class="logo" src="assets/img/logo.png" alt="Ashtyn" />
+        <div id="socials" class="socials"></div>
+      </section>
+
+      <section data-view="gear" hidden>
+        <h1>Gear</h1>
+        <p class="lede">My Current PC Specs.</p>
+        <div id="gearList" class="gear"></div>
+      </section>
+
+      <section data-view="settings" hidden>
+        <h1>Settings</h1>
+        <p class="lede">My Counter-Strike 2 settings.</p>
+        <div id="settingsList" class="gear"></div>
+      </section>
+
+      <section data-view="listening" hidden>
+        <h1>Listening</h1>
+        <p class="lede" id="npLede"></p>
+        <div id="np" class="np"></div>
+        <div id="recent" class="recent"></div>
+      </section>
+    </main>
+
+    <a class="mark" href="#home" aria-label="Back to home">ashtyn</a>
+
+    <footer class="player" aria-label="Music player">
+      <button id="pPrev" aria-label="Previous track">&#8592;</button>
+      <button id="pPlay" aria-label="Play or pause">&#9654;</button>
+      <button id="pNext" aria-label="Next track">&#8594;</button>
+      <div class="pmeta"><span id="pTitle">Not playing</span><input id="pSeek" type="range" min="0" max="100" value="0" aria-label="Seek" /></div>
+      <input id="pVol" type="range" min="0" max="100" value="15" aria-label="Volume" />
+    </footer>
+  </div>
+
+  <audio id="audio" preload="auto"></audio>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
