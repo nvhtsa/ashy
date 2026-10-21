@@ -1,5 +1,5 @@
 window.SITE = {
-  lastfm: { user: "ashylmao", apiKey: "3f9e2ad015bfab6972d36388cf615f0e" },
+  lastfm: { user: "ashylmao", apiKey: "acb226da5cf87113c09f9253d8b68a7c" },
 
   playlist: [
     { title: "TORN – Ramzoid", src: "assets/media/track1.mp3" },
