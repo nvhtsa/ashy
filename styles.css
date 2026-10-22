@@ -4,6 +4,15 @@
   font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
+
+/* Scrollbars: slim, dark and violet to match the site */
+:root{color-scheme:dark}
+*{scrollbar-width:thin;scrollbar-color:rgba(167,139,250,.38) transparent}
+*::-webkit-scrollbar{width:12px;height:12px}
+*::-webkit-scrollbar-track{background:transparent}
+*::-webkit-scrollbar-thumb{background:rgba(167,139,250,.32);border:3px solid transparent;background-clip:content-box;border-radius:99px}
+*::-webkit-scrollbar-thumb:hover{background:rgba(167,139,250,.62);background-clip:content-box}
+*::-webkit-scrollbar-button,*::-webkit-scrollbar-corner{display:none}
 html,body{min-height:100%;background:var(--ink);color:var(--text);line-height:1.5}
 a{color:inherit;text-decoration:none}
 :focus-visible{outline:2px solid var(--violet);outline-offset:3px}
