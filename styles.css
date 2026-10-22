@@ -5,7 +5,6 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 
-/* Scrollbars: slim, dark and violet to match the site */
 :root{color-scheme:dark}
 *{scrollbar-width:thin;scrollbar-color:rgba(167,139,250,.38) transparent}
 *::-webkit-scrollbar{width:12px;height:12px}
@@ -97,7 +96,6 @@ dd{overflow-wrap:anywhere}
 pre{padding:14px 16px;border-radius:12px;border:1px solid var(--line);background:rgba(12,9,20,.7);
   font:13px/1.6 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-height:340px;overflow:auto}
 
-/* Settings: minimized cards that drop down */
 .group.fold{padding:0;overflow:hidden}
 .fold-title{margin:0;font-size:inherit}
 .fold-title button{display:flex;align-items:center;gap:14px;width:100%;padding:20px 24px;border:0;background:transparent;
@@ -198,7 +196,7 @@ input[type=range]:hover::-moz-range-thumb,input[type=range]:focus-visible::-moz-
   #pVol,#pMute,#pArtist{display:none}
   .player{gap:12px;padding:10px 14px 10px 8px}
 }
-/* Motion: entry and tab changes */
+
 :root{--ease:cubic-bezier(.22,1,.36,1)}
 @keyframes rise{from{opacity:0;transform:translateY(18px) scale(.985)}}
 @keyframes drop{from{opacity:0;transform:translateY(-16px) scale(.94)}}
