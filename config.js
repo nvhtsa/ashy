@@ -1,5 +1,5 @@
 window.SITE = {
-  lastfm: { user: "ashylmao", apiKey: "acb226da5cf87113c09f9253d8b68a7c" },
+  lastfm: { user: "ashylmao", apiKey: "3f9e2ad015bfab6972d36388cf615f0e" },
 
   playlist: [
     { title: "TORN – Ramzoid", src: "assets/media/track1.mp3" },
@@ -35,7 +35,7 @@ window.SITE = {
   settings: [
     { group: "Counter-Strike 2", items: [
       ["Sensitivity", "1.68"], ["DPI", "1800"], ["eDPI", "3024"],
-      ["Resolution", "1568x1050 stretched"]
+      ["Resolution", "1568x1050 STRETCHED"]
     ], blocks: [
       { label: "Crosshair code", text: "CSxSM9W3OnxpoXUnDD9RD3Nc3rxW5J5PcqqkKu6qAccEPJ" },
       { label: "Launch options", text: "-exec autoexec.cfg -noreflex -high -novid" },
@@ -76,6 +76,21 @@ alias jbn "-duck; bind mouse_x jb1"
 alias jb1 "+jump; bind mouse_x jb2"
 alias jb2 "-jump; revert"
 alias revert "bind mouse_x yaw"` }
+    ]},
+
+    { group: "Fortnite", items: [
+      ["X-axis sensitivity", "5.0%"], ["Y-axis sensitivity", "5.0%"],
+      ["Targeting sensitivity", "60.1%"], ["Scoping sensitivity", "60.1%"],
+      ["Building sensitivity", "135%"], ["Editing sensitivity", "135%"],
+      ["DPI", "1800"], ["Resolution", "2560x1440"], ["Graphics", "Performance Mode"]
+    ]},
+    { group: "Valorant", items: [
+      ["Sensitivity", "0.333"], ["DPI", "1800"], ["Resolution", "1568x1050 STRETCHED"]
+    ], blocks: [
+      { label: "Crosshair code", text: "0;s;1;P;h;0;0l;4;0o;1;0a;0.394;0f;0;1o;2;1a;1;1m;0;1f;0" }
+    ]},
+    { group: "Overwatch 2", items: [
+      ["FOV", "103"], ["Sensitivity", "4.25%"]
     ]},
   ]
 };

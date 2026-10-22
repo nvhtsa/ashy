@@ -21,12 +21,34 @@
       el("div", { className: "bhead" }, el("span", { textContent: b.label }), btn),
       el("pre", { textContent: b.text }));
   };
-  const cards = (target, groups) => groups.forEach((g) => target.append(
-    el("section", { className: "group" }, el("h2", { textContent: g.group }),
+  const chevron = () => {
+    const s = el("span", { className: "fold-chev" });
+    s.innerHTML = '<svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l5 5 5-5"/></svg>';
+    return s;
+  };
+  let foldId = 0;
+  // fold = true: each card starts minimized and drops down when its header is pressed
+  const cards = (target, groups, fold) => groups.forEach((g) => {
+    const body = [
       el("dl", {}, ...(g.items || []).flatMap(([k, v]) => [el("dt", { textContent: k }), el("dd", { textContent: v })])),
-      ...(g.blocks || []).map(block))));
+      ...(g.blocks || []).map(block)];
+    if (!fold) return target.append(el("section", { className: "group" }, el("h2", { textContent: g.group }), ...body));
+    const id = `fold${++foldId}`, count = (g.items || []).length + (g.blocks || []).length;
+    const open = g.open === true;
+    const btn = el("button", { type: "button", id: `${id}-btn` },
+      el("span", { className: "fold-name", textContent: g.group }),
+      el("span", { className: "fold-meta", textContent: `${count} setting${count === 1 ? "" : "s"}` }), chevron());
+    btn.setAttribute("aria-expanded", String(open)); btn.setAttribute("aria-controls", id);
+    const card = el("section", { className: "group fold" + (open ? " open" : "") },
+      el("h2", { className: "fold-title" }, btn),
+      el("div", { className: "fold-panel", id, role: "region" },
+        el("div", { className: "fold-inner" }, el("div", { className: "fold-body" }, ...body))));
+    card.querySelector(".fold-panel").setAttribute("aria-labelledby", `${id}-btn`);
+    btn.onclick = () => btn.setAttribute("aria-expanded", String(card.classList.toggle("open")));
+    target.append(card);
+  });
   cards($("#gearList"), C.gear);
-  cards($("#settingsList"), C.settings || []);
+  cards($("#settingsList"), C.settings || [], true);
 
   // Tabs (clean path routing keeps the music playing between pages)
   const views = [...document.querySelectorAll("[data-view]")].filter((v) => v.tagName === "SECTION");
@@ -95,7 +117,12 @@
   route(false);
 
   // Player + audio analysis. The whole site reacts to this music.
-  const audio = $("#audio"), title = $("#pTitle"), playBtn = $("#pPlay"), seek = $("#pSeek"), vol = $("#pVol");
+  const audio = $("#audio"), title = $("#pTitle"), artist = $("#pArtist"), playBtn = $("#pPlay"), seek = $("#pSeek"), vol = $("#pVol"),
+    cur = $("#pCur"), dur = $("#pDur"), mute = $("#pMute");
+  const ICON_PLAY = '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>';
+  const ICON_PAUSE = '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg>';
+  const fmt = (s) => (isFinite(s) ? `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}` : "0:00");
+  const fill = (inp) => inp.style.setProperty("--p", (inp.value / inp.max) * 100 + "%");
   let i = 0, actx = null, analyser = null, gain = null, freq = null;
   const fx = { bass: 0, kick: 0, mid: 0, hit: false, k: 1 };
   try {
@@ -106,7 +133,12 @@
     src.connect(analyser); src.connect(gain); gain.connect(actx.destination);
     freq = new Uint8Array(analyser.frequencyBinCount);
   } catch (e) { actx = analyser = gain = null; }
-  const setVol = () => { const v = vol.value / 100; if (gain) gain.gain.value = v; else audio.volume = v; };
+  const setVol = () => {
+    const v = vol.value / 100; if (gain) gain.gain.value = v; else audio.volume = v;
+    fill(vol); mute.classList.toggle("off", v === 0);
+  };
+  let lastVol = 15;
+  mute.onclick = () => { if (+vol.value > 0) { lastVol = +vol.value; vol.value = 0; } else vol.value = lastVol || 15; setVol(); };
   vol.oninput = setVol; setVol();
 
   // Browsers block sound until the visitor interacts. Try on load; if blocked,
@@ -128,7 +160,10 @@
 
   function load(n, play) {
     i = (n + C.playlist.length) % C.playlist.length;
-    audio.src = C.playlist[i].src; title.textContent = C.playlist[i].title; seek.value = 0;
+    audio.src = C.playlist[i].src;
+    const [name, ...by] = C.playlist[i].title.split(/\s+[–—-]\s+/);
+    title.textContent = name; artist.textContent = by.join(" – ");
+    seek.value = 0; fill(seek); cur.textContent = "0:00"; dur.textContent = "0:00";
     mark();
     if (play) startMusic();
   }
@@ -136,12 +171,19 @@
   $("#pNext").onclick = () => load(i + 1, true);
   $("#pPrev").onclick = () => load(i - 1, true);
   audio.onplay = audio.onpause = () => {
-    playBtn.innerHTML = audio.paused ? "&#9654;" : "&#10074;&#10074;";
+    playBtn.innerHTML = audio.paused ? ICON_PLAY : ICON_PAUSE;
     playerEl.classList.toggle("playing", !audio.paused);
   };
   audio.onended = () => load(i + 1, true);
-  audio.ontimeupdate = () => { if (audio.duration) seek.value = (audio.currentTime / audio.duration) * 100; };
-  seek.oninput = () => { if (audio.duration) audio.currentTime = (seek.value / 100) * audio.duration; };
+  audio.ontimeupdate = () => {
+    if (audio.duration) seek.value = (audio.currentTime / audio.duration) * 100;
+    fill(seek); cur.textContent = fmt(audio.currentTime);
+  };
+  audio.onloadedmetadata = () => (dur.textContent = fmt(audio.duration));
+  seek.oninput = () => {
+    if (audio.duration) audio.currentTime = (seek.value / 100) * audio.duration;
+    fill(seek); cur.textContent = fmt(audio.currentTime);
+  };
   // Expandable tracklist: pick any song
   const playerEl = document.querySelector(".player"), queue = $("#pQueue"), listBtn = $("#pList");
   C.playlist.forEach((t, n) => queue.append(el("button", { type: "button", onclick: () => load(n, true) },
