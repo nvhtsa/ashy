@@ -12,6 +12,7 @@ window.SITE = {
   socials: [
     { name: "Twitch", icon: "twitch", url: "https://twitch.tv/suckers" },
     { name: "YouTube", icon: "youtube", url: "https://youtube.com/@ashtyn" },
+    { name: "Steam", icon: "steam", url: "https://steamcommunity.com/id/pissing" },
     { name: "TikTok", icon: "tiktok", url: "https://tiktok.com/@disaster" },
     { name: "X", icon: "x", url: "https://x.com/ashtynfps" },
     { name: "SoundCloud", icon: "soundcloud", url: "https://soundcloud.com/ashy" },

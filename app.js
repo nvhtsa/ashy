@@ -52,7 +52,11 @@
   const tabs = [...document.querySelectorAll("nav a")];
   const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
-  const replay = (node) => { node.classList.remove("enter"); void node.offsetWidth; node.classList.add("enter"); };
+  const replay = (node, slide) => {
+    node.classList.remove("enter", "slide"); void node.offsetWidth;
+    node.classList.add("enter"); if (slide) node.classList.add("slide");
+  };
+  const bloom = $("#bloom");
   const PAGE_NAMES = new Set(["gear", "settings", "listening"]);
   const pathFor = (page) => page === "home" ? "/" : `/${page}`;
   const pageFromLocation = () => {
@@ -86,9 +90,16 @@
     document.title = TITLES[v] || "ASHTYN";
     const cur = views.find((x) => !x.hidden);
     if (cur && cur.dataset.view === v) { cur.classList.remove("leaving"); return; }
-    if (cur && animate && !calm) {
+    const fancy = !!(cur && animate && !calm);
+    if (fancy) {
+      const pill = tabs.find((a) => (a.pathname.replace(/\/$/, "") || "/") === pathFor(v));
+      if (pill) {
+        const r = pill.getBoundingClientRect();
+        bloom.style.left = r.left + r.width / 2 + "px"; bloom.style.top = r.top + r.height / 2 + "px";
+      }
+      bloom.classList.remove("go"); void bloom.offsetWidth; bloom.classList.add("go");
       cur.classList.add("leaving");
-      await wait(180);
+      await wait(280);
       if (id !== routeId) return;
       cur.classList.remove("leaving");
     }
@@ -366,6 +377,21 @@
     requestAnimationFrame(frame);
   }
   initOrbs($("#bgOrbs"), calm);
+
+  (function initGlow() {
+    if (calm || !matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    const glow = $("#cursorGlow");
+    let x = -400, y = -400;
+    addEventListener("pointermove", (e) => {
+      if (e.pointerType === "touch") return;
+      x = e.clientX; y = e.clientY; glow.classList.add("on");
+    }, { passive: true });
+    document.documentElement.addEventListener("mouseleave", () => glow.classList.remove("on"));
+    (function loop() {
+      glow.style.transform = `translate3d(${x}px,${y}px,0) scale(${1 + fx.bass * .1 + fx.kick * .04})`;
+      requestAnimationFrame(loop);
+    })();
+  })();
 
   const intro = initIntro($("#intro"), calm);
   let opened = false;
