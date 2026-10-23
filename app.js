@@ -5,9 +5,50 @@
     const n = Object.assign(document.createElement(tag), props); n.append(...kids); return n;
   };
 
+
   C.socials.forEach((s) => $("#socials").append(
-    el("a", { href: s.url, target: "_blank", rel: "noreferrer noopener" },
-      el("img", { src: `assets/icons/${s.icon}.svg`, alt: "" }), s.name)));
+    el("span", { className: "fl" },
+      el("a", { href: s.url, target: "_blank", rel: "noreferrer noopener" },
+        el("img", { src: `assets/icons/${s.icon}.svg`, alt: "" }), s.name))));
+
+  const socialLinks = [...document.querySelectorAll("#socials a")];
+  const socialShift = socialLinks.map(() => ({ x: 0, y: 0, tx: 0, ty: 0 }));
+  let pointerX = null, pointerY = null;
+  if (matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    addEventListener("pointermove", (e) => {
+      if (e.pointerType === "touch") return;
+      pointerX = e.clientX; pointerY = e.clientY;
+    }, { passive: true });
+    const lose = () => { pointerX = pointerY = null; };
+    addEventListener("blur", lose);
+    document.documentElement.addEventListener("mouseleave", lose);
+  }
+
+  let driftLast = 0;
+  function driftSocials(now) {
+    if (!socialLinks.length || calm || document.body.dataset.view !== "home") return;
+    const dt = Math.min(.05, Math.max(0, (now - (driftLast || now)) / 1000));
+    driftLast = now;
+    const ease = 1 - Math.exp(-dt / .1);
+    for (let i = 0; i < socialLinks.length; i++) {
+      const s = socialShift[i];
+      let tx = 0, ty = 0;
+      if (pointerX !== null) {
+        const r = socialLinks[i].getBoundingClientRect();
+        const dx = pointerX - (r.left + r.width / 2), dy = pointerY - (r.top + r.height / 2);
+        const near = Math.max(0, 1 - Math.hypot(dx, dy) / 300);
+        tx = Math.max(-5, Math.min(5, dx * .06)) * near;
+        ty = Math.max(-4, Math.min(4, dy * .06)) * near;
+      }
+      s.tx = tx; s.ty = ty;
+    }
+    for (let i = 0; i < socialLinks.length; i++) {
+      const s = socialShift[i];
+      s.x += (s.tx - s.x) * ease;
+      s.y += (s.ty - s.y) * ease;
+      socialLinks[i].style.translate = `${s.x.toFixed(2)}px ${s.y.toFixed(2)}px`;
+    }
+  }
 
   const copy = (btn, text) => btn.onclick = async () => {
     try { await navigator.clipboard.writeText(text); btn.textContent = "Copied"; }
@@ -92,6 +133,7 @@
     if (cur && cur.dataset.view === v) { cur.classList.remove("leaving"); return; }
     const fancy = !!(cur && animate && !calm);
     if (fancy) {
+
       const pill = tabs.find((a) => (a.pathname.replace(/\/$/, "") || "/") === pathFor(v));
       if (pill) {
         const r = pill.getBoundingClientRect();
@@ -282,7 +324,7 @@
     if (!canvas || !canvas.getContext) return;
     const vctx = canvas.getContext("2d");
     const PAD = 46, BAR = 2, GAP = 3;
-    const MAX = 34, LOW_SPAN = 24;           
+    const MAX = 34, LOW_SPAN = 24;          
     let dpr = 1, ox = 0, oy = 0, bars = [], runs = [], raf = 0, pending = 0;
     let env = new Float32Array(0), target = new Float32Array(0), smooth = new Float32Array(0), ease = new Float32Array(0);
     let mean = 0, last = performance.now(), clock = 0;
@@ -300,7 +342,7 @@
         const near = Math.min(x - x0, x0 + span - x) - step / 2;
         const t = Math.max(0, Math.min(1, near / curve));
         const cap = Math.sqrt(1 - (1 - t) * (1 - t));
-        const edge = Math.abs((i + .5) / n - .5) * 2; 
+        const edge = Math.abs((i + .5) / n - .5) * 2;  
         bars.push({ x, y: -hh, nx: 0, ny: -1, u: edge, cap });
       }
       cut();
@@ -338,7 +380,7 @@
       for (let i = 0; i < n; i++) {
         const s = Math.pow(bars[i].u, 2.1) * LOW_SPAN, a = s | 0, f = s - a;
         const v = Math.min(1, (fx.bands[a] * (1 - f) + fx.bands[Math.min(BANDS - 1, a + 1)] * f) * fx.k);
-        target[i] = Math.pow(v, 1.35); 
+        target[i] = Math.pow(v, 1.35);  
       }
       for (let i = 0; i < n; i++) {
         const p0 = target[i ? i - 1 : 0], p2 = target[i < n - 1 ? i + 1 : n - 1];
@@ -351,12 +393,13 @@
       for (let i = 0; i < n; i++) {
         const t = smooth[i];
         env[i] += (t - env[i]) * (t > env[i] ? kUp : kDown);
-        const idle = .026 + .014 * Math.sin(clock * 1.2 + bars[i].u * 8); 
+        const idle = .026 + .014 * Math.sin(clock * 1.2 + bars[i].u * 8);
         const v = Math.min(1, env[i] * (1.08 + kick * .55) + (live ? 0 : idle)) * bars[i].cap;
         ease[i] = v;
         total += v;
       }
       mean += (total / Math.max(1, n) - mean) * (1 - Math.exp(-dt / .12));
+
       const grad = vctx.createLinearGradient(0, -MAX - 40, 0, 0);
       grad.addColorStop(0, `rgba(150,110,255,${(.1 + Math.min(.24, mean * .6)).toFixed(3)})`);
       grad.addColorStop(.55, `rgba(130,90,240,${(.05 + Math.min(.14, mean * .34)).toFixed(3)})`);
@@ -428,6 +471,7 @@
   const logo = document.querySelector(".logo");
   function analyse(now) {
     meter(now);
+    driftSocials(now);
     if (logo && !calm) {
       const sc = 1 + fx.bass * .075 + fx.kick * .11, sh = Math.min(30, fx.kick * fx.kick * 12);
       logo.style.transform = `translate(${(Math.random() - .5) * sh}px,${(Math.random() - .5) * sh}px) scale(${sc})`;

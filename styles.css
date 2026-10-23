@@ -79,6 +79,13 @@ h2{font-size:18px;font-weight:600;margin-bottom:10px}
 .socials a{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;
   border:1px solid var(--line);background:rgba(21,16,31,.6);backdrop-filter:blur(8px);
   transition:border-color .15s,background .15s}
+.fl{display:inline-flex;animation:float 7.5s ease-in-out infinite}
+.fl:nth-child(1){animation-duration:7.4s;animation-delay:-.4s}
+.fl:nth-child(2){animation-duration:8.1s;animation-delay:-2.2s}
+.fl:nth-child(3){animation-duration:6.8s;animation-delay:-3.9s}
+.fl:nth-child(4){animation-duration:7.8s;animation-delay:-1.3s}
+.fl:nth-child(5){animation-duration:6.5s;animation-delay:-5.1s}
+.fl:nth-child(6){animation-duration:8.4s;animation-delay:-3s}
 .socials a:hover{border-color:var(--violet);background:rgba(167,139,250,.12)}
 .socials img{width:18px;height:18px;opacity:.9}
 
@@ -201,6 +208,12 @@ input[type=range]:hover::-moz-range-thumb,input[type=range]:focus-visible::-moz-
 
 :root{--ease:cubic-bezier(.22,1,.36,1)}
 @keyframes rise{from{opacity:0;transform:translateY(18px) scale(.985)}}
+@keyframes float{
+  0%,100%{translate:0 0;rotate:0deg}
+  26%{translate:2px -4.4px;rotate:-.8deg}
+  55%{translate:.4px -6.4px;rotate:.2deg}
+  78%{translate:-2.2px -2.6px;rotate:.9deg}
+}
 @keyframes drop{from{opacity:0;transform:translateY(-16px) scale(.94)}}
 @keyframes lift{from{opacity:0;transform:translate(-50%,26px)}}
 @keyframes glow{from{filter:drop-shadow(0 0 0 rgba(109,61,240,0))}}
@@ -226,12 +239,12 @@ section.leaving{opacity:0;transform:scale(.985);pointer-events:none}
 .enter .gear>.group:nth-child(n+4){animation-delay:.38s}
 .home.enter .logo{animation:rise .9s var(--ease) backwards,glow 2s ease-out backwards}
 .home.enter .socials a{animation:rise .7s var(--ease) backwards}
-.home.enter .socials a:nth-child(1){animation-delay:.25s}
-.home.enter .socials a:nth-child(2){animation-delay:.31s}
-.home.enter .socials a:nth-child(3){animation-delay:.37s}
-.home.enter .socials a:nth-child(4){animation-delay:.43s}
-.home.enter .socials a:nth-child(5){animation-delay:.49s}
-.home.enter .socials a:nth-child(6){animation-delay:.55s}
+.home.enter .socials .fl:nth-child(1) a{animation-delay:.25s}
+.home.enter .socials .fl:nth-child(2) a{animation-delay:.31s}
+.home.enter .socials .fl:nth-child(3) a{animation-delay:.37s}
+.home.enter .socials .fl:nth-child(4) a{animation-delay:.43s}
+.home.enter .socials .fl:nth-child(5) a{animation-delay:.49s}
+.home.enter .socials .fl:nth-child(6) a{animation-delay:.55s}
 
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
