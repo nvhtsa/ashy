@@ -137,15 +137,86 @@
   const fmt = (s) => (isFinite(s) ? `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}` : "0:00");
   const fill = (inp) => inp.style.setProperty("--p", (inp.value / inp.max) * 100 + "%");
   let i = 0, actx = null, analyser = null, gain = null, freq = null;
-  const fx = { bass: 0, kick: 0, mid: 0, hit: false, k: 1 };
+  const BANDS = 56;
+  const fx = {
+    bass: 0, mid: 0, high: 0, kick: 0, hit: false, k: 1, live: false, last: 0, lo: null, hi: null,
+    bands: new Float32Array(BANDS), ref: new Float32Array(BANDS), tmp: new Float32Array(BANDS)
+  };
+  let bassAvg = 0, lastHit = 0;
   try {
     actx = new (window.AudioContext || window.webkitAudioContext)();
     const src = actx.createMediaElementSource(audio);
-    analyser = actx.createAnalyser(); analyser.fftSize = 1024; analyser.smoothingTimeConstant = .7;
+    analyser = actx.createAnalyser(); analyser.fftSize = 2048; analyser.smoothingTimeConstant = .7;
+    analyser.minDecibels = -95; analyser.maxDecibels = -6;
     gain = actx.createGain();
     src.connect(analyser); src.connect(gain); gain.connect(actx.destination);
     freq = new Uint8Array(analyser.frequencyBinCount);
   } catch (e) { actx = analyser = gain = null; }
+
+  function mapBands() {
+    if (!analyser) return;
+    const binHz = actx.sampleRate / analyser.fftSize, top = analyser.frequencyBinCount - 1;
+    const lo = [], hi = [];
+    for (let b = 0; b < BANDS; b++) {
+      const e0 = Math.max(1, Math.round(55 * Math.pow(12000 / 55, b / BANDS) / binHz));
+      const e1 = Math.max(1, Math.round(55 * Math.pow(12000 / 55, (b + 1) / BANDS) / binHz));
+      lo.push(Math.min(e0, top));
+      hi.push(Math.min(top + 1, Math.max(e0 + 1, e1)));
+    }
+    fx.lo = lo; fx.hi = hi;
+  }
+
+  function meter(now) {
+    if (!fx.last) fx.last = now;
+    const dt = Math.min(.05, Math.max(0, (now - fx.last) / 1000));
+    fx.last = now;
+    const vf = gain ? gain.gain.value : audio.volume;
+    fx.k = vf < .15 ? .2 + (vf / .15) * .8 : 1 + (vf - .15) * 1.41;
+    fx.live = !!(analyser && !audio.paused && actx && actx.state === "running");
+    const bands = fx.bands, ref = fx.ref, tmp = fx.tmp;
+
+    if (fx.live) {
+      analyser.getByteFrequencyData(freq);
+      if (!fx.lo) mapBands();
+      const follow = 1 - Math.exp(-dt / .55);
+      for (let b = 0; b < BANDS; b++) {
+        let sum = 0, c = 0;
+        for (let k = fx.lo[b]; k < fx.hi[b]; k++) { sum += freq[k]; c++; }
+        const raw = c ? sum / c / 255 : 0;
+        const music = raw < .06 ? 0 : (raw - .06) / .94;
+        ref[b] += (music - ref[b]) * follow;
+        const u = b / (BANDS - 1);
+        const shape = .26 + .64 * Math.pow(1 - u, .75);
+        const jump = 3.2 * Math.pow(1 - u, 1.3);
+        bands[b] = Math.max(0, Math.min(1, shape * (.42 + music * .92) * .7 + (music - ref[b]) * jump));
+      }
+      for (let b = 0; b < BANDS; b++) tmp[b] = b
+        ? (bands[b - 1] + bands[b] * 2 + bands[Math.min(BANDS - 1, b + 1)]) * .25
+        : bands[0];
+      bands.set(tmp);
+    } else {
+      const fall = Math.pow(.2, dt);
+      for (let b = 0; b < BANDS; b++) { bands[b] *= fall; ref[b] *= fall; }
+    }
+
+    let low = 0, high = 0, mid = 0;
+    for (let b = 0; b < 10; b++) low += bands[b];
+    for (let b = 10; b < 30; b++) mid += bands[b];
+    for (let b = 30; b < BANDS; b++) high += bands[b];
+    low /= 10; mid /= 20; high /= BANDS - 30;
+
+    const ease = (cur, next, up, down) => cur + (next - cur) * (1 - Math.exp(-dt / (next > cur ? up : down)));
+    fx.bass = ease(fx.bass, Math.min(1, low * fx.k), .03, .16);
+    fx.mid = ease(fx.mid, Math.min(1, mid * fx.k), .05, .22);
+    fx.high = ease(fx.high, Math.min(1, high * fx.k), .04, .2);
+
+    const dev = low - bassAvg;
+    bassAvg += (low - bassAvg) * (1 - Math.exp(-dt / .7));
+    fx.hit = dev > .07 && now - lastHit > 140;
+    if (fx.hit) { fx.kick = Math.min(1, dev * 4.5); lastHit = now; }
+    fx.kick *= Math.pow(.86, dt * 60);
+  }
+
   const setVol = () => {
     const v = vol.value / 100; if (gain) gain.gain.value = v; else audio.volume = v;
     fill(vol); mute.classList.toggle("off", v === 0);
@@ -206,28 +277,157 @@
   addEventListener("keydown", (e) => { if (e.key === "Escape") setOpen(false); });
   addEventListener("pointerdown", (e) => { if (!e.target.closest(".player")) setOpen(false); });
 
+  (function initViz() {
+    const canvas = $("#viz");
+    if (!canvas || !canvas.getContext) return;
+    const vctx = canvas.getContext("2d");
+    const PAD = 46, BAR = 2, GAP = 3;
+    const MAX = 34, LOW_SPAN = 24;           
+    let dpr = 1, ox = 0, oy = 0, bars = [], runs = [], raf = 0, pending = 0;
+    let env = new Float32Array(0), target = new Float32Array(0), smooth = new Float32Array(0), ease = new Float32Array(0);
+    let mean = 0, last = performance.now(), clock = 0;
+
+    function build(w, h, r) {
+      const hw = w / 2, hh = h / 2, rad = Math.max(0, Math.min(r, hw, hh));
+      const x0 = -hw + rad, span = Math.max(1, (hw - rad) * 2);
+      const n = Math.max(6, Math.round(span / (BAR + GAP)));
+      const curve = Math.max(1, rad * 1.4), step = span / n;
+      bars = []; runs = [];
+      let runStart = 0;
+      const cut = () => { if (bars.length > runStart) runs.push([runStart, bars.length]); runStart = bars.length; };
+      for (let i = 0; i < n; i++) {
+        const x = x0 + ((i + .5) / n) * span;
+        const near = Math.min(x - x0, x0 + span - x) - step / 2;
+        const t = Math.max(0, Math.min(1, near / curve));
+        const cap = Math.sqrt(1 - (1 - t) * (1 - t));
+        const edge = Math.abs((i + .5) / n - .5) * 2; 
+        bars.push({ x, y: -hh, nx: 0, ny: -1, u: edge, cap });
+      }
+      cut();
+      const len = bars.length;
+      env = new Float32Array(len); target = new Float32Array(len);
+      smooth = new Float32Array(len); ease = new Float32Array(len);
+    }
+
+    function layout() {
+      const rect = playerEl.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      dpr = Math.min(2, devicePixelRatio || 1);
+      const rad = parseFloat(getComputedStyle(playerEl).borderTopLeftRadius) || 22;
+      const vw = document.documentElement.clientWidth || innerWidth;
+      const left = Math.max(0, Math.round(rect.left));
+      const right = Math.min(vw, Math.round(rect.right));
+      const top = Math.max(0, Math.round(rect.top - PAD));
+      const W = Math.max(1, right - left), H = Math.max(1, Math.round(rect.top - top + 4));
+      canvas.style.left = left + "px"; canvas.style.top = top + "px";
+      canvas.style.width = W + "px"; canvas.style.height = H + "px";
+      canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+      const cx = rect.left + rect.width / 2, mid = rect.top + rect.height / 2;
+      ox = cx - left; oy = mid - top;
+      build(rect.width, rect.height, rad);
+    }
+
+    function frame(now) {
+      const dt = Math.min(.05, (now - last) / 1000); last = now; clock += dt;
+      vctx.setTransform(1, 0, 0, 1, 0, 0);
+      vctx.clearRect(0, 0, canvas.width, canvas.height);
+      vctx.setTransform(dpr, 0, 0, dpr, ox * dpr, oy * dpr);
+      const live = fx.live;
+      const n = bars.length;
+
+      for (let i = 0; i < n; i++) {
+        const s = Math.pow(bars[i].u, 2.1) * LOW_SPAN, a = s | 0, f = s - a;
+        const v = Math.min(1, (fx.bands[a] * (1 - f) + fx.bands[Math.min(BANDS - 1, a + 1)] * f) * fx.k);
+        target[i] = Math.pow(v, 1.35); 
+      }
+      for (let i = 0; i < n; i++) {
+        const p0 = target[i ? i - 1 : 0], p2 = target[i < n - 1 ? i + 1 : n - 1];
+        smooth[i] = (p0 + target[i] * 2 + p2) * .25;
+      }
+
+      const kUp = 1 - Math.exp(-dt / .022), kDown = 1 - Math.exp(-dt / .18);
+      const kick = fx.kick;
+      let total = 0;
+      for (let i = 0; i < n; i++) {
+        const t = smooth[i];
+        env[i] += (t - env[i]) * (t > env[i] ? kUp : kDown);
+        const idle = .026 + .014 * Math.sin(clock * 1.2 + bars[i].u * 8); 
+        const v = Math.min(1, env[i] * (1.08 + kick * .55) + (live ? 0 : idle)) * bars[i].cap;
+        ease[i] = v;
+        total += v;
+      }
+      mean += (total / Math.max(1, n) - mean) * (1 - Math.exp(-dt / .12));
+      const grad = vctx.createLinearGradient(0, -MAX - 40, 0, 0);
+      grad.addColorStop(0, `rgba(150,110,255,${(.1 + Math.min(.24, mean * .6)).toFixed(3)})`);
+      grad.addColorStop(.55, `rgba(130,90,240,${(.05 + Math.min(.14, mean * .34)).toFixed(3)})`);
+      grad.addColorStop(1, "rgba(109,61,240,0)");
+      vctx.fillStyle = grad;
+      for (const [a0, a1] of runs) {
+        vctx.beginPath();
+        vctx.moveTo(bars[a0].x, bars[a0].y);
+        for (let i = a0 + 1; i < a1; i++) vctx.lineTo(bars[i].x, bars[i].y);
+        for (let i = a1 - 1; i >= a0; i--) {
+          const b = bars[i], l = 4.5 + ease[i] * MAX + BAR / 2;
+          vctx.lineTo(b.x + b.nx * l, b.y + b.ny * l);
+        }
+        vctx.closePath();
+        vctx.fill();
+      }
+
+      vctx.lineCap = "round"; vctx.lineWidth = 1;
+      vctx.strokeStyle = `rgba(167,139,250,${(.07 + Math.min(.3, fx.bass * .4 + fx.kick * .3)).toFixed(3)})`;
+      for (const [a0, a1] of runs) {
+        vctx.beginPath();
+        for (let i = a0; i < a1; i++) (i === a0 ? vctx.moveTo(bars[i].x, bars[i].y) : vctx.lineTo(bars[i].x, bars[i].y));
+        vctx.stroke();
+      }
+
+      vctx.lineWidth = BAR;
+      for (let q = 0; q < 4; q++) {
+        const hot = q >= 2 ? "232,224,255" : "167,139,250";
+        vctx.strokeStyle = `rgba(${hot},${(.1 + ((q + 1) / 4) * .62).toFixed(3)})`;
+        vctx.beginPath();
+        for (let i = 0; i < n; i++) {
+          if (Math.min(3, (ease[i] * 4) | 0) !== q) continue;
+          const b = bars[i], l = 2 + ease[i] * MAX;
+          vctx.moveTo(b.x + b.nx * 2.5, b.y + b.ny * 2.5);
+          vctx.lineTo(b.x + b.nx * (2.5 + l), b.y + b.ny * (2.5 + l));
+        }
+        vctx.stroke();
+      }
+
+      vctx.lineJoin = "round"; vctx.lineCap = "round";
+      for (let pass = 0; pass < 2; pass++) {
+        vctx.lineWidth = pass ? 1.4 : 6;
+        vctx.strokeStyle = `rgba(226,216,255,${(pass
+          ? .28 + Math.min(.5, mean * 1.1)
+          : .06 + Math.min(.12, mean * .3)).toFixed(3)})`;
+        for (const [a0, a1] of runs) {
+          vctx.beginPath();
+          for (let i = a0; i < a1; i++) {
+            const b = bars[i], l = 4.5 + ease[i] * MAX + BAR / 2;
+            if (i === a0) vctx.moveTo(b.x, b.y - l);
+            else vctx.lineTo(b.x, b.y - l);
+          }
+          vctx.stroke();
+        }
+      }
+      if (!calm) raf = requestAnimationFrame(frame);
+    }
+    const relayout = () => { cancelAnimationFrame(pending); pending = requestAnimationFrame(layout); };
+    addEventListener("resize", relayout);
+    if (window.ResizeObserver) new ResizeObserver(relayout).observe(playerEl);
+    playerEl.addEventListener("animationend", relayout);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout).catch(() => {});
+    layout();
+    raf = requestAnimationFrame(frame);
+  })();
+
   load(Math.floor(Math.random() * C.playlist.length), true); 
 
   const logo = document.querySelector(".logo");
-  let avg = 0, lastHit = 0;
   function analyse(now) {
-    fx.hit = false;
-    if (analyser && !audio.paused && actx.state === "running") {
-      analyser.getByteFrequencyData(freq);
-      let b = 0, m = 0;
-      for (let k = 1; k <= 6; k++) b += freq[k];
-      for (let k = 12; k < 64; k++) m += freq[k];
-      b /= 6 * 255; m /= 52 * 255;
-
-      const vf = gain ? gain.gain.value : audio.volume;
-      const k = fx.k = vf < .15 ? .2 + (vf / .15) * .8 : 1 + (vf - .15) * 1.41;
-      avg = avg * .96 + b * .04;
-      if (b > .3 && b > avg * 1.1 + .02 && now - lastHit > 140) { fx.kick = k; fx.hit = true; lastHit = now; }
-      const tb = b * k;
-      fx.bass += (tb - fx.bass) * (tb > fx.bass ? .55 : .12);
-      fx.mid += (m * k - fx.mid) * .3;
-    } else { fx.bass *= .92; fx.mid *= .92; avg *= .98; }
-    fx.kick *= .86;
+    meter(now);
     if (logo && !calm) {
       const sc = 1 + fx.bass * .075 + fx.kick * .11, sh = Math.min(30, fx.kick * fx.kick * 12);
       logo.style.transform = `translate(${(Math.random() - .5) * sh}px,${(Math.random() - .5) * sh}px) scale(${sc})`;
@@ -301,7 +501,7 @@
       const t = still ? 0 : now / 1000, ft = flyAt ? (now - flyAt) / 1000 : 0, p = Math.min(1, ft / 1.1);
       ctx.clearRect(0, 0, W, H);
       ctx.globalCompositeOperation = "lighter";
-      const B = still ? 0 : fx.bass, K = still ? 0 : fx.kick;
+      const B = still ? 0 : fx.bass * .12, K = still ? 0 : fx.kick * .12;
 
       const spread = 1 + p * p * 2.5;
       towers.forEach((tw) => {

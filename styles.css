@@ -126,6 +126,8 @@ pre{padding:14px 16px;border-radius:12px;border:1px solid var(--line);background
 .recent a:hover{background:rgba(167,139,250,.1);color:var(--text)}
 .recent span:first-child{color:var(--text)}
 
+.viz{position:fixed;z-index:4;display:block;pointer-events:none}
+
 .player{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:5;
   width:min(780px,calc(100vw - 24px));display:flex;align-items:center;gap:20px;padding:10px 20px 10px 12px;
   border:1px solid rgba(167,139,250,.14);border-radius:22px;background:rgba(18,13,28,.78);
