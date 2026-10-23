@@ -173,7 +173,8 @@
 
 
   const audio = $("#audio"), title = $("#pTitle"), artist = $("#pArtist"), playBtn = $("#pPlay"), seek = $("#pSeek"), vol = $("#pVol"),
-    cur = $("#pCur"), dur = $("#pDur"), mute = $("#pMute");
+    cur = $("#pCur"), dur = $("#pDur"), mute = $("#pMute"), art = $("#pArt"), artImg = $("#pArtImg"),
+    artLetter = $("#pArtLetter");
   const ICON_PLAY = '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>';
   const ICON_PAUSE = '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg>';
   const fmt = (s) => (isFinite(s) ? `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}` : "0:00");
@@ -282,11 +283,54 @@
   audio.addEventListener("playing", settle);
   if (actx) actx.onstatechange = settle;
 
+
+  function huePair(s) {
+    let h = 2166136261;
+    for (let k = 0; k < s.length; k++) { h ^= s.charCodeAt(k); h = Math.imul(h, 16777619); }
+    h >>>= 0;
+    const a = 248 + h % 44;                   
+    const b = (a + 26 + (h >>> 8) % 24) % 360;
+    return [`hsl(${a} 72% 50%)`, `hsl(${b} 66% 62%)`];
+  }
+
+  function paintGradient(track, name) {
+    const [c1, c2] = huePair(track.title);
+    art.style.setProperty("--c1", c1);
+    art.style.setProperty("--c2", c2);
+    artLetter.textContent = (name.trim()[0] || "♪").toUpperCase();
+    artImg.hidden = true;
+    artImg.removeAttribute("src");
+    art.classList.add("gen");
+  }
+
+  let coverTimer = 0, coverToken = 0;
+  function showCover(track, name) {
+    const token = ++coverToken;   
+    clearTimeout(coverTimer);
+    art.classList.add("swapping");
+    const reveal = () => {
+      if (token !== coverToken) return;
+      clearTimeout(coverTimer);
+      art.classList.remove("swapping");
+    };
+    const settle = () => { clearTimeout(coverTimer); coverTimer = setTimeout(reveal, 120); };
+    coverTimer = setTimeout(reveal, 900);   
+    if (!track.art) { paintGradient(track, name); settle(); return; }
+    artImg.onload = settle;
+    artImg.onerror = () => { paintGradient(track, name); settle(); };
+    art.classList.remove("gen");
+    artLetter.textContent = "";
+    artImg.hidden = false;
+    artImg.src = track.art;
+    if (artImg.complete && artImg.naturalWidth) settle();  
+  }
+
   function load(n, play) {
     i = (n + C.playlist.length) % C.playlist.length;
     audio.src = C.playlist[i].src;
     const [name, ...by] = C.playlist[i].title.split(/\s+[–—-]\s+/);
     title.textContent = name; artist.textContent = by.join(" – ");
+    showCover(C.playlist[i], name);
     seek.value = 0; fill(seek); cur.textContent = "0:00"; dur.textContent = "0:00";
     mark();
     if (play) startMusic();
