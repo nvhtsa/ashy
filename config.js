@@ -28,7 +28,7 @@ window.SITE = {
       ["Second monitor", "Sceptre C305B 30in 200 Hz"]
     ]},
     { group: "Peripherals", items: [
-      ["Mouse", "Logitech PRO X Superlight 2 [1800 DPI, 1.68 > CS2"], ["Keyboard", "Wooting 60HE+"],
+      ["Mouse", "Logitech PRO X Superlight 2"], ["Keyboard", "Wooting 60HE+"],
       ["Mousepad", "Superglide​ XL Glass ​Mousepad"], ["Headset", "HyperX Cloud II"], ["Microphone", "FIFINE K688"]
     ]}
   ],
