@@ -98,7 +98,7 @@
     node.classList.add("enter"); if (slide) node.classList.add("slide");
   };
   const bloom = $("#bloom");
-  const PAGE_NAMES = new Set(["gear", "settings", "listening"]);
+  const PAGE_NAMES = new Set(["gear", "settings", "listening", "guestbook"]);
   const pathFor = (page) => page === "home" ? "/" : `/${page}`;
   const pageFromLocation = () => {
     const last = location.pathname.split("/").filter(Boolean).pop() || "home";
@@ -109,11 +109,12 @@
   home: "ASHTYN®",
   gear: "Gear | ASHTYN®",
   settings: "Settings | ASHTYN®",
-  listening: "Listening | ASHTYN®"
+  listening: "Listening | ASHTYN®",
+  guestbook: "Guestbook | ASHTYN®"
 };
 
   const fallbackPath = new URLSearchParams(location.search).get("p");
-  if (fallbackPath && /^\/(gear|settings|listening)\/?$/.test(fallbackPath)) {
+  if (fallbackPath && /^\/(gear|settings|listening|guestbook)\/?$/.test(fallbackPath)) {
     history.replaceState(null, "", fallbackPath.replace(/\/$/, ""));
   } else if (location.hash) {
     const legacyPage = location.hash.slice(1);
@@ -147,6 +148,7 @@
     }
     views.forEach((x) => (x.hidden = x.dataset.view !== v));
     if (animate) replay(views.find((x) => x.dataset.view === v));
+    dispatchEvent(new CustomEvent("viewchange", { detail: { view: v } }));
   }
 
   tabs.forEach((a) => a.addEventListener("click", (e) => {

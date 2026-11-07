@@ -42,6 +42,7 @@
         <a href="/gear">Gear</a>
         <a href="/settings">Settings</a>
         <a href="/listening">Listening</a>
+        <a href="/guestbook">Guestbook</a>
       </nav>
     </header>
 
@@ -68,6 +69,42 @@
         <p class="lede" id="npLede"></p>
         <div id="np" class="np"></div>
         <div id="recent" class="recent"></div>
+      </section>
+      <section data-view="guestbook" hidden>
+        <h1>Guestbook</h1>
+        <p class="lede">Sign it before the domain goes. Every name here disappears with ashy.lol in January.</p>
+
+        <div class="gb-clock" id="gbClock" aria-label="Time left before the guestbook closes">
+          <div><b id="gbDays">—</b><span>days</span></div>
+          <div><b id="gbHours">—</b><span>hours</span></div>
+          <div><b id="gbMinutes">—</b><span>minutes</span></div>
+          <div><b id="gbSeconds">—</b><span>seconds</span></div>
+        </div>
+
+        <form class="gb-form" id="gbForm" novalidate>
+          <div class="gb-row">
+            <label for="gbName">Name <span>optional</span></label>
+            <input id="gbName" type="text" maxlength="40" autocomplete="nickname" placeholder="anonymous" />
+          </div>
+          <div class="gb-row">
+            <label for="gbMessage">Message</label>
+            <textarea id="gbMessage" maxlength="280" rows="3" placeholder="Something worth losing." required></textarea>
+            <div class="gb-count"><span id="gbChars">0</span>/280</div>
+          </div>
+          <input class="gb-trap" id="gbTrap" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
+          <div class="gb-actions">
+            <button type="submit" id="gbSubmit">Sign it</button>
+            <p class="gb-msg" id="gbMsg" role="status" aria-live="polite"></p>
+          </div>
+        </form>
+
+        <p class="gb-setup" id="gbSetup" hidden>The guestbook is being set up. The countdown already works.</p>
+
+        <div class="gb-list-head">
+          <h2>Signatures</h2>
+          <span id="gbMeta"></span>
+        </div>
+        <ol class="gb-list" id="gbList"></ol>
       </section>
     </main>
 
@@ -114,5 +151,6 @@
   <script src="playlist.js?v=6cee7de1"></script>
   <script src="app.js?v=ashtyn-cap-20"></script>
   <script src="brand-animation.js?v=1"></script>
+  <script src="guestbook.js?v=2"></script>
 </body>
 </html>

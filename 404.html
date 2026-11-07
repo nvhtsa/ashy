@@ -6,7 +6,7 @@
   <title>ASHTYN</title>
   <script>
     const path = window.location.pathname;
-    if (/^\/(gear|settings|listening)\/?$/.test(path)) {
+    if (/^\/(gear|settings|listening|guestbook)\/?$/.test(path)) {
       window.location.replace("/?p=" + encodeURIComponent(path));
     } else {
       window.location.replace("/");

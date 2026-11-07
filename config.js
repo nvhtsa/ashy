@@ -93,5 +93,11 @@ alias revert "bind mouse_x yaw"` }
     { group: "Overwatch 2", items: [
       ["FOV", "103"], ["Sensitivity", "4.25%"]
     ]},
-  ]
+  ],
+
+  guestbook: {
+    supabaseUrl: "https://kwwwvrmitlgdniuuvdib.supabase.co",
+    supabaseKey: "sb_publishable_3jzeYAud2fuC4zjXscMszg_MTOPdSsd",
+    expiresAt: "2027-01-16T23:59:59Z"
+  }
 };
