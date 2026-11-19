@@ -26,7 +26,7 @@
 
   let driftLast = 0;
   function driftSocials(now) {
-    if (!socialLinks.length || calm || document.body.dataset.view !== "home") return;
+    if (!socialLinks.length || calm || document.body.dataset.view !== "guestbook") return;
     const dt = Math.min(.05, Math.max(0, (now - (driftLast || now)) / 1000));
     driftLast = now;
     const ease = 1 - Math.exp(-dt / .1);
@@ -50,127 +50,21 @@
     }
   }
 
-  const copy = (btn, text) => btn.onclick = async () => {
-    try { await navigator.clipboard.writeText(text); btn.textContent = "Copied"; }
-    catch (e) { btn.textContent = "Copy failed"; }
-    setTimeout(() => (btn.textContent = "Copy"), 1500);
-  };
-  const block = (b) => {
-    const btn = el("button", { type: "button", textContent: "Copy" }); copy(btn, b.text);
-    return el("div", { className: "block" },
-      el("div", { className: "bhead" }, el("span", { textContent: b.label }), btn),
-      el("pre", { textContent: b.text }));
-  };
-  const chevron = () => {
-    const s = el("span", { className: "fold-chev" });
-    s.innerHTML = '<svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l5 5 5-5"/></svg>';
-    return s;
-  };
-  let foldId = 0;
-  const cards = (target, groups, fold) => groups.forEach((g) => {
-    const body = [
-      el("dl", {}, ...(g.items || []).flatMap(([k, v]) => [el("dt", { textContent: k }), el("dd", { textContent: v })])),
-      ...(g.blocks || []).map(block)];
-    if (!fold) return target.append(el("section", { className: "group" }, el("h2", { textContent: g.group }), ...body));
-    const id = `fold${++foldId}`, count = (g.items || []).length + (g.blocks || []).length;
-    const open = g.open === true;
-    const btn = el("button", { type: "button", id: `${id}-btn` },
-      el("span", { className: "fold-name", textContent: g.group }),
-      el("span", { className: "fold-meta", textContent: `${count} setting${count === 1 ? "" : "s"}` }), chevron());
-    btn.setAttribute("aria-expanded", String(open)); btn.setAttribute("aria-controls", id);
-    const card = el("section", { className: "group fold" + (open ? " open" : "") },
-      el("h2", { className: "fold-title" }, btn),
-      el("div", { className: "fold-panel", id, role: "region" },
-        el("div", { className: "fold-inner" }, el("div", { className: "fold-body" }, ...body))));
-    card.querySelector(".fold-panel").setAttribute("aria-labelledby", `${id}-btn`);
-    btn.onclick = () => btn.setAttribute("aria-expanded", String(card.classList.toggle("open")));
-    target.append(card);
-  });
-  cards($("#gearList"), C.gear);
-  cards($("#settingsList"), C.settings || [], true);
 
-  const views = [...document.querySelectorAll("[data-view]")].filter((v) => v.tagName === "SECTION");
-  const tabs = [...document.querySelectorAll("nav a")];
+  const view = document.querySelector('section[data-view="guestbook"]');
   const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
-  const replay = (node, slide) => {
-    node.classList.remove("enter", "slide"); void node.offsetWidth;
-    node.classList.add("enter"); if (slide) node.classList.add("slide");
+  const replay = (node) => {
+    if (!node) return;
+    node.classList.remove("enter", "slide"); void node.offsetWidth; node.classList.add("enter");
   };
-  const bloom = $("#bloom");
-  const PAGE_NAMES = new Set(["gear", "settings", "listening", "guestbook"]);
-  const pathFor = (page) => page === "home" ? "/" : `/${page}`;
-  const pageFromLocation = () => {
-    const last = location.pathname.split("/").filter(Boolean).pop() || "home";
-    return PAGE_NAMES.has(last) ? last : "home";
-  };
-  let routeId = 0;
-  const TITLES = {
-  home: "ASHTYN®",
-  gear: "Gear | ASHTYN®",
-  settings: "Settings | ASHTYN®",
-  listening: "Listening | ASHTYN®",
-  guestbook: "Guestbook | ASHTYN®"
-};
 
-  const fallbackPath = new URLSearchParams(location.search).get("p");
-  if (fallbackPath && /^\/(gear|settings|listening|guestbook)\/?$/.test(fallbackPath)) {
-    history.replaceState(null, "", fallbackPath.replace(/\/$/, ""));
-  } else if (location.hash) {
-    const legacyPage = location.hash.slice(1);
-    if (legacyPage === "home" || PAGE_NAMES.has(legacyPage)) {
-      history.replaceState(null, "", pathFor(legacyPage));
-    }
-  }
+  // One page now. Old deep links such as /gear or #settings land here.
+  document.body.dataset.view = "guestbook";
+  document.title = "Guestbook | ASHTYN®";
+  if (location.search || location.hash) history.replaceState(null, "", "/");
 
-  async function route(animate) {
-    const id = ++routeId;
-    const v = pageFromLocation();
-    tabs.forEach((a) => a.setAttribute("aria-current",
-      (a.pathname.replace(/\/$/, "") || "/") === pathFor(v) ? "page" : "false"));
-    document.body.dataset.view = v;
-    document.title = TITLES[v] || "ASHTYN";
-    const cur = views.find((x) => !x.hidden);
-    if (cur && cur.dataset.view === v) { cur.classList.remove("leaving"); return; }
-    const fancy = !!(cur && animate && !calm);
-    if (fancy) {
-
-      const pill = tabs.find((a) => (a.pathname.replace(/\/$/, "") || "/") === pathFor(v));
-      if (pill) {
-        const r = pill.getBoundingClientRect();
-        bloom.style.left = r.left + r.width / 2 + "px"; bloom.style.top = r.top + r.height / 2 + "px";
-      }
-      bloom.classList.remove("go"); void bloom.offsetWidth; bloom.classList.add("go");
-      cur.classList.add("leaving");
-      await wait(280);
-      if (id !== routeId) return;
-      cur.classList.remove("leaving");
-    }
-    views.forEach((x) => (x.hidden = x.dataset.view !== v));
-    if (animate) replay(views.find((x) => x.dataset.view === v));
-    dispatchEvent(new CustomEvent("viewchange", { detail: { view: v } }));
-  }
-
-  tabs.forEach((a) => a.addEventListener("click", (e) => {
-    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-    e.preventDefault();
-    const page = a.pathname.split("/").filter(Boolean).pop() || "home";
-    if (page !== pageFromLocation()) {
-      history.pushState(null, "", pathFor(PAGE_NAMES.has(page) ? page : "home"));
-      route(true);
-    }
-  }));
-  const homeMark = document.querySelector(".mark");
-  if (homeMark) homeMark.addEventListener("click", (e) => {
-    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-    e.preventDefault();
-    if (pageFromLocation() !== "home") {
-      history.pushState(null, "", "/");
-      route(true);
-    }
-  });
-  addEventListener("popstate", () => route(true));
-  route(false);
+  replay(view);
+  dispatchEvent(new CustomEvent("viewchange", { detail: { view: "guestbook" } }));
 
 
 
@@ -528,41 +422,6 @@
   }
   requestAnimationFrame(analyse);
 
-  const { user, apiKey } = C.lastfm;
-  const ago = (uts) => {
-    const m = Math.round((Date.now() / 1000 - uts) / 60);
-    return m < 1 ? "just now" : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} d ago`;
-  };
-  function show(tracks, msg) {
-    const np = $("#np"), recent = $("#recent");
-    np.replaceChildren(); recent.replaceChildren(); np.classList.remove("live");
-    if (!tracks) { $("#npLede").textContent = ""; np.append(el("p", { textContent: msg })); return; }
-    const t = tracks[0], live = t["@attr"]?.nowplaying === "true";
-    $("#npLede").textContent = live ? "Playing on Spotify right now." : "Nothing playing right now. This is my last track.";
-    np.classList.toggle("live", live);
-    np.append(
-      el("img", { className: "art", src: t.image?.[3]?.["#text"] || "", alt: "" }),
-      el("div", {},
-        el("a", { className: "t", href: t.url, target: "_blank", rel: "noreferrer noopener", textContent: t.name }),
-        el("div", { className: "s", textContent: `${t.artist["#text"]}${t.album["#text"] ? " on " + t.album["#text"] : ""}` }),
-        el("div", { className: "st", textContent: live ? "Playing now" : t.date ? ago(t.date.uts) : "" })));
-    tracks.slice(1, 6).forEach((r) => recent.append(
-      el("a", { href: r.url, target: "_blank", rel: "noreferrer noopener" },
-        el("span", { textContent: `${r.name} by ${r.artist["#text"]}` }),
-        el("span", { textContent: r.date ? ago(r.date.uts) : "" }))));
-  }
-  async function poll() {
-    if (!user || !apiKey) { show(null, "Add your Last.fm username and API key in config.js to show what you're listening to."); return false; }
-    try {
-      const r = await fetch(`https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${encodeURIComponent(user)}&api_key=${encodeURIComponent(apiKey)}&format=json&limit=6`);
-      const d = await r.json();
-      if (!d.recenttracks) throw new Error(d.message);
-      const tracks = [].concat(d.recenttracks.track);
-      show(tracks);
-      return tracks[0]?.["@attr"]?.nowplaying === "true";
-    } catch (e) { show(null, "Couldn't reach Last.fm. Check the username and API key in config.js."); return false; }
-  }
-  poll(); setInterval(poll, 20000);
 
   function initIntro(canvas, still) {
     const ctx = canvas.getContext("2d"), DPR = Math.min(2, devicePixelRatio || 1);
@@ -692,7 +551,7 @@
     intro.fly();
     setTimeout(() => {
       $("#splash").classList.add("gone"); $("#app").classList.add("in");
-      replay(views.find((x) => !x.hidden));
+      replay(view);
       setTimeout(intro.stop, 1200);
     }, calm ? 0 : 850);
   };

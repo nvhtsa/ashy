@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ashtyn — exports</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --charcoal:#14121a;
+  --smoke:#e9e5dd;
+  --iris:#9b8af0;
+  --iris-ink:#6f5bd0;
+  --ash:#89839a;
+  --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:var(--charcoal);color-scheme:dark}
+body{font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+.stage{position:relative;overflow:hidden}
+.stage:not(.on){display:none}
+.stage.on{display:grid;place-items:center}
+
+/* ---- wordmark ---- */
+.wm{font-weight:600;letter-spacing:-.04em;line-height:.92;white-space:nowrap;display:block}
+.wm .br{color:var(--iris);font-weight:600;letter-spacing:0;padding:0 .05em;font-size:.54em;vertical-align:.12em}
+
+/* ---- youtube banner ---- */
+.yt{background:var(--smoke);width:2560px;height:1440px}
+.yt.dark{background:var(--charcoal)}
+.safe{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:1546px;height:423px;
+  display:grid;place-items:center;
+}
+.yt .wm{font-size:356px;color:var(--charcoal)}
+.yt .wm .br{color:var(--iris-ink)}
+.yt.dark .wm{color:var(--smoke)}
+.yt.dark .wm .br{color:var(--iris)}
+
+/* ---- twitch banner ---- */
+.tw{background:var(--charcoal);display:grid;place-items:center;width:1200px;height:480px}
+.tw::before{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(80% 120% at 50% 128%,rgba(155,138,240,.16),transparent 70%);
+}
+.tw .wm{position:relative;font-size:200px;color:var(--smoke)}
+
+/* ---- profile pictures ---- */
+.pfp{display:grid;place-items:center;background:var(--charcoal)}
+.pfp.light{background:var(--smoke)}
+.pfp .wm{color:var(--smoke);letter-spacing:-.02em}
+.pfp .wm .br{color:var(--iris)}
+.pfp.light .wm{color:var(--charcoal)}
+.pfp.light .wm .br{color:var(--iris-ink)}
+.pfp-1024{width:1024px;height:1024px}
+.pfp-800{width:800px;height:800px}
+.pfp-256{width:256px;height:256px}
+.pfp-1024 .wm{font-size:566px}
+.pfp-800  .wm{font-size:442px}
+.pfp-256  .wm{font-size:142px}
+
+/* ---- standalone mark, for alpha extraction ---- */
+.mkstage{width:100vw;height:100vh}
+.mkstage .wm{font-size:1540px}
+#mk-black{background:#000}
+#mk-white{background:#fff}
+
+/* ---- thumbnail template (1280 x 720) ---- */
+.thumb2{position:relative;width:1280px;height:720px;overflow:hidden;background:transparent}
+.thumb2 .art{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(110% 80% at 74% 8%,rgba(255,255,255,.10),transparent 62%),
+    radial-gradient(85% 75% at 18% 96%,#33525c,transparent 68%),
+    linear-gradient(155deg,#1d2b31,#080b0d);
+}
+.thumb2 .title{
+  position:absolute;left:51px;top:44px;width:860px;
+  font-size:95px;line-height:.95;font-weight:700;letter-spacing:-.035em;color:#fff;
+  text-shadow:0 6px 26px rgba(0,0,0,.45);
+}
+.thumb2 .chip{
+  position:absolute;left:51px;bottom:50px;display:inline-flex;align-items:center;gap:14px;
+  padding:13px 20px;border-radius:7px;
+  background:rgba(20,18,26,.78);border:1px solid rgba(233,229,221,.28);
+}
+.thumb2 .mk{font:600 26px/1 var(--mono);color:var(--iris)}
+.thumb2 .sep{font:400 24px/1 var(--mono);color:rgba(233,229,221,.35)}
+.thumb2 .lb{font:500 24px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--smoke)}
+
+.thumb2[data-only="art"] .title,
+.thumb2[data-only="art"] .chip,
+.thumb2[data-only="plate"] .title,
+.thumb2[data-only="plate"] .mk,
+.thumb2[data-only="plate"] .sep,
+.thumb2[data-only="plate"] .lb,
+.thumb2[data-only="mark"] .title,
+.thumb2[data-only="mark"] .lb,
+.thumb2[data-only="mark"] .sep,
+.thumb2[data-only="label"] .title,
+.thumb2[data-only="label"] .mk,
+.thumb2[data-only="label"] .sep,
+.thumb2[data-only="title"] .art,
+.thumb2[data-only="title"] .chip{display:none}
+
+.thumb2[data-only="mark"] .chip,
+.thumb2[data-only="label"] .chip{background:transparent;border-color:transparent;padding:0;border-radius:0}
+</style>
+</head>
+<body>
+
+<!-- NOTE: the banner, profile and mk-* stages below are LEGACY. They still render the
+     old bracket mark. The live mark and every current export come from make_mark.py.
+     Only the thumbnail stages and mk-black/mk-white (glyph strips for build_video.py)
+     are still in use. -->
+
+<!-- YouTube banner, light -->
+<div class="stage yt" id="yt-light">
+  <div class="safe">
+    <span class="wm"><span class="br">[</span>ashtyn<span class="br">]</span></span>
+  </div>
+</div>
+
+<!-- YouTube banner, inverse -->
+<div class="stage yt dark" id="yt-dark">
+  <div class="safe">
+    <span class="wm"><span class="br">[</span>ashtyn<span class="br">]</span></span>
+  </div>
+</div>
+
+<!-- Twitch profile banner -->
+<div class="stage tw" id="twitch">
+  <span class="wm"><span class="br">[</span>ashtyn<span class="br">]</span></span>
+</div>
+
+<!-- Thumbnail template: composite -->
+<div class="stage" id="thumb-all">
+  <div class="thumb2" data-only="all">
+    <div class="art"></div>
+    <div class="title">Der Eisendrache,<br>again</div>
+    <div class="chip">
+      <span class="mk">a</span><span class="sep">/</span><span class="lb">Zombies · Part 1</span>
+    </div>
+  </div>
+</div>
+
+<!-- Thumbnail template: single layers -->
+<div class="stage" id="thumb-art"><div class="thumb2" data-only="art"><div class="art"></div></div></div>
+<div class="stage" id="thumb-plate">
+  <div class="thumb2" data-only="plate"><div class="chip"><span class="mk">a</span><span class="sep">/</span><span class="lb">Zombies</span></div></div>
+</div>
+<div class="stage" id="thumb-mark">
+  <div class="thumb2" data-only="mark"><div class="chip"><span class="mk">a</span></div></div>
+</div>
+<div class="stage" id="thumb-label">
+  <div class="thumb2" data-only="label"><div class="chip"><span class="lb">ZOMBIES · PART 1</span></div></div>
+</div>
+<div class="stage" id="thumb-title">
+  <div class="thumb2" data-only="title"><div class="title">Der Eisendrache,<br>again</div></div>
+</div>
+
+<!-- Standalone mark on pure black / pure white, for building the transparent logo -->
+<div class="stage mkstage" id="mk-black">
+  <span class="wm"><span class="br">[</span>a<span class="br">]</span></span>
+</div>
+<div class="stage mkstage" id="mk-white">
+  <span class="wm"><span class="br">[</span>a<span class="br">]</span></span>
+</div>
+
+<!-- Profile pictures -->
+<div class="stage pfp pfp-1024" id="pfp-dark-1024">
+  <span class="wm"><span class="br">[</span>a<span class="br">]</span></span>
+</div>
+<div class="stage pfp pfp-800" id="pfp-dark-800">
+  <span class="wm"><span class="br">[</span>a<span class="br">]</span></span>
+</div>
+<div class="stage pfp pfp-256" id="pfp-dark-256">
+  <span class="wm"><span class="br">[</span>a<span class="br">]</span></span>
+</div>
+<div class="stage pfp light pfp-800" id="pfp-light-800">
+  <span class="wm"><span class="br">[</span>a<span class="br">]</span></span>
+</div>
+
+<script>
+  const id = location.hash.slice(1) || new URLSearchParams(location.search).get('a');
+  const el = id && document.getElementById(id);
+  if (el) el.classList.add('on');
+</script>
+</body>
+</html>

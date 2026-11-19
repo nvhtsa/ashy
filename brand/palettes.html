@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ashtyn — palette options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#100e0d; --ink2:#171412; --bone:#efeae0; --bone2:#ded8ca;
+  --static:#8a857b; --line:#2a2622;
+  --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  --sans:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--ink);color-scheme:dark}
+body{background:var(--ink);color:var(--bone);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1060px;margin:0 auto;padding:0 clamp(20px,4vw,32px) 110px}
+a{color:inherit}
+
+.hero{padding:clamp(48px,8vw,88px) 0 clamp(28px,4vw,40px);border-bottom:1px solid var(--line)}
+.back{font:11px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--static);text-decoration:none;display:inline-block;margin-bottom:26px}
+.back:hover{color:var(--bone)}
+.kicker{font:11px/1 var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--static)}
+.hero h1{font-size:clamp(42px,8vw,82px);font-weight:600;letter-spacing:-.045em;line-height:.94;margin:16px 0 20px}
+.hero .sub{max-width:64ch;color:var(--bone2);font-size:clamp(15px,1.6vw,17px)}
+.hero .sub b{color:var(--bone);font-weight:600}
+.token-note{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.token-note span{font:10.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--static);border:1px solid var(--line);border-radius:999px;padding:7px 12px}
+
+/* ---------- option ---------- */
+.opt{
+  border:1px solid var(--line);border-radius:18px;padding:clamp(18px,3vw,26px);
+  background:var(--card);margin-top:clamp(22px,3.5vw,34px);
+}
+.opt-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:6px}
+.opt-head h2{font-size:clamp(23px,3vw,30px);font-weight:600;letter-spacing:-.03em}
+.opt-head h2 em{font-style:normal;color:var(--acc)}
+.opt-num{font:11px/1 var(--mono);letter-spacing:.18em;color:var(--mut);display:block;margin-bottom:8px}
+.opt-code{font:10.5px/1 var(--mono);letter-spacing:.1em;color:var(--mut)}
+.chosen{display:inline-block;vertical-align:middle;margin-left:10px;font:10px/1 var(--mono);letter-spacing:.16em;
+  text-transform:uppercase;color:#14121A;background:#9B8AF0;border-radius:999px;padding:6px 10px}
+.opt[data-chosen] .opt-desc b{color:#9B8AF0}
+.opt-desc{font-size:13.5px;color:var(--mut);max-width:66ch;margin:8px 0 18px}
+.opt-desc b{color:var(--fg);font-weight:600}
+
+.surfaces{display:grid;grid-template-columns:1.08fr 1fr;gap:14px;align-items:start}
+@media (max-width:700px){.surfaces{grid-template-columns:1fr}}
+
+.wm{font-weight:600;letter-spacing:-.035em;line-height:.9;white-space:nowrap}
+.wm .br{color:var(--acc);font-weight:500;padding:0 .05em;font-size:.54em;vertical-align:.12em}
+
+.mini-banner{
+  aspect-ratio:16/9;border-radius:10px;background:var(--ink);color:var(--fg);
+  display:grid;place-items:center;container-type:inline-size;
+  border:1px solid rgba(255,255,255,.06);
+  position:relative;overflow:hidden;
+}
+.mini-banner::before{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(120% 100% at 50% 120%,rgba(255,255,255,.045),transparent 65%);
+}
+.mini-banner .wm{font-size:7.4cqw}
+.mini-banner .lbl{
+  position:absolute;right:4%;bottom:6.5%;
+  font:.85cqw/1.9 var(--mono);letter-spacing:.2em;text-transform:uppercase;
+  color:var(--fg);opacity:.32;text-align:right;
+}
+
+.mini-thumb{position:relative;aspect-ratio:16/9;border-radius:10px;overflow:hidden;container-type:inline-size;background:#0b0a09}
+.mini-thumb .art{position:absolute;inset:0;
+  background:
+    radial-gradient(110% 80% at 74% 8%,rgba(255,255,255,.1),transparent 62%),
+    radial-gradient(85% 75% at 18% 96%,var(--b),transparent 68%),
+    linear-gradient(155deg,var(--a),var(--c));
+}
+.mini-thumb .art::after{
+  content:"game capture";position:absolute;inset:0;display:grid;place-items:center;
+  font:1.4cqw/1 var(--mono);letter-spacing:.4em;text-transform:uppercase;color:rgba(255,255,255,.15);
+}
+.mini-thumb .title{
+  position:absolute;left:4%;top:7%;width:66%;
+  font-size:7cqw;font-weight:700;line-height:.95;letter-spacing:-.035em;color:#fff;
+  text-shadow:0 .15cqw .9cqw rgba(0,0,0,.5);
+}
+.mini-thumb .tag{
+  position:absolute;left:4%;bottom:7%;display:flex;align-items:center;gap:1.1cqw;
+  padding:1cqw 1.6cqw;border-radius:.5cqw;
+  background:rgba(10,10,10,.74);border:.12cqw solid rgba(255,255,255,.26);
+  font:1.85cqw/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:#f2f0ec;
+}
+.mini-thumb .tag .b{color:var(--acc);font-weight:600;letter-spacing:0;font-size:2.05cqw;text-transform:none}
+.mini-thumb .tag .b .br{font-size:.68em;vertical-align:.12em}
+.mini-thumb .tag .sep{color:rgba(255,255,255,.3)}
+
+.opt-foot{display:flex;justify-content:space-between;gap:18px;align-items:flex-end;flex-wrap:wrap;margin-top:16px}
+.avs{display:flex;gap:10px;align-items:center}
+.av{
+  display:grid;place-items:center;border-radius:50%;flex:none;
+  width:52px;height:52px;background:var(--ink);color:var(--fg);
+  border:1px solid rgba(255,255,255,.09);
+}
+.av.light{background:var(--fg);color:var(--ink);border-color:transparent}
+.av.light .br{color:var(--accLt)}
+.av.small{width:32px;height:32px}
+.av .wm{font-size:26px;letter-spacing:-.015em}
+.av.small .wm{font-size:16px}
+.av .wm .br{font-weight:600;padding:0 .05em}
+.avs .cap{font:9.5px/1.5 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--mut);margin-left:4px}
+
+.swrow{display:flex;gap:7px;flex-wrap:wrap}
+.sw2{
+  border-radius:9px;padding:8px 10px;min-width:88px;background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.07);
+}
+.sw2 .chip{width:100%;height:22px;border-radius:5px;display:block;margin-bottom:7px;border:1px solid rgba(255,255,255,.1)}
+.sw2 .name{display:block;font-size:10.5px;color:var(--fg);font-weight:600;letter-spacing:.01em}
+.sw2 code{font:9.5px/1.5 var(--mono);letter-spacing:.06em;color:var(--mut)}
+
+/* ---------- closing ---------- */
+.choose{margin-top:clamp(40px,6vw,64px);padding-top:clamp(28px,4vw,40px);border-top:1px solid var(--line)}
+.choose h2{font-size:clamp(23px,3vw,30px);font-weight:600;letter-spacing:-.03em;margin-bottom:10px}
+.choose p{max-width:66ch;color:var(--bone2);font-size:14.5px;margin-bottom:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.card{background:var(--ink2);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.card strong{display:block;font-size:14px;font-weight:600;margin-bottom:6px}
+.card p{font-size:13px;color:var(--static);margin:0}
+footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+footer span{font:10.5px/1.8 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--static)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <a class="back" href="index.html">← full brand board</a>
+    <p class="kicker">Palette options &nbsp;·&nbsp; four swaps</p>
+    <h1>Same frame,<br>different temperature.</h1>
+    <p class="sub">The mark, the type, and the thumbnail layout don't change here — only the five tokens that carry color. Each option below is rendered on the real surfaces at real proportions, so compare the <b>accent</b> against the thumbnails, not the swatches.</p>
+    <div class="token-note">
+      <span>field</span><span>ink</span><span>text</span><span>accent</span><span>accent on light</span>
+    </div>
+  </header>
+
+  <!-- 01 -->
+  <article class="opt" style="--ink:#12171C;--card:#171C21;--fg:#E6E9EA;--acc:#C4603C;--accLt:#A9502F;--mut:#78828A">
+    <div class="opt-head">
+      <div><span class="opt-num">01</span><h2>Slate &amp; <em>Rust</em></h2></div>
+      <span class="opt-code">#12171C · #E6E9EA · #C4603C</span>
+    </div>
+    <p class="opt-desc"><b>Cool base, warm signal.</b> A blue-black slate instead of warm charcoal, paired with a burnt rust that reads as weathered metal rather than alarm. The rust is the only heat in the frame, so it holds attention without ever being loud, and it stays distinct on Zombies' cold blues and on bright skate footage alike.</p>
+    <div class="surfaces">
+      <div class="mini-banner">
+        <div class="wm"><span class="br">[</span>ashtyn<span class="br">]</span></div>
+        <div class="lbl">zombies<br>single-player<br>whatever's next</div>
+      </div>
+      <div class="mini-thumb">
+        <div class="art" style="--a:#1d2b31;--b:#33525c;--c:#080b0d"></div>
+        <div class="title">Der Eisendrache,<br>again</div>
+        <div class="tag"><span class="b"><span class="br">[</span>a<span class="br">]</span></span><span class="sep">/</span><span>Zombies</span></div>
+      </div>
+    </div>
+    <div class="opt-foot">
+      <div class="avs">
+        <div class="av"><div class="wm"><span class="br">[</span>a<span class="br">]</span></div></div>
+        <div class="av light"><div class="wm"><span class="br">[</span>a<span class="br">]</span></div></div>
+        <div class="av small"><div class="wm">a</div></div>
+        <span class="cap">dark / light / 32px</span>
+      </div>
+      <div class="swrow">
+        <div class="sw2"><span class="chip" style="background:#12171C"></span><span class="name">Slate</span><code>#12171C</code></div>
+        <div class="sw2"><span class="chip" style="background:#E6E9EA"></span><span class="name">Fog</span><code>#E6E9EA</code></div>
+        <div class="sw2"><span class="chip" style="background:#C4603C"></span><span class="name">Rust</span><code>#C4603C</code></div>
+        <div class="sw2"><span class="chip" style="background:#78828A"></span><span class="name">Static</span><code>#78828A</code></div>
+      </div>
+    </div>
+  </article>
+
+  <!-- 02 -->
+  <article class="opt" style="--ink:#0C1420;--card:#111A26;--fg:#EDE8DE;--acc:#E2A34C;--accLt:#B8792B;--mut:#7F8B99">
+    <div class="opt-head">
+      <div><span class="opt-num">02</span><h2>Navy &amp; <em>Amber</em></h2></div>
+      <span class="opt-code">#0C1420 · #EDE8DE · #E2A34C</span>
+    </div>
+    <p class="opt-desc"><b>Blue hour.</b> A deep navy field with warm amber — the palette of a lit lamp in a dark room.</p>
+    <p class="opt-desc">This one leans slightly cinematic, which suits the single-player and long-form Zombies end of the channel. Amber is softer than lime but has more warmth than a neutral, so it feels human rather than technical.</p>
+    <div class="surfaces">
+      <div class="mini-banner">
+        <div class="wm"><span class="br">[</span>ashtyn<span class="br">]</span></div>
+        <div class="lbl">zombies<br>single-player<br>whatever's next</div>
+      </div>
+      <div class="mini-thumb">
+        <div class="art" style="--a:#2c2a24;--b:#8a6a33;--c:#0a0a08"></div>
+        <div class="title">I finally<br>finished it</div>
+        <div class="tag"><span class="b"><span class="br">[</span>a<span class="br">]</span></span><span class="sep">/</span><span>Single player</span></div>
+      </div>
+    </div>
+    <div class="opt-foot">
+      <div class="avs">
+        <div class="av"><div class="wm"><span class="br">[</span>a<span class="br">]</span></div></div>
+        <div class="av light"><div class="wm"><span class="br">[</span>a<span class="br">]</span></div></div>
+        <div class="av small"><div class="wm">a</div></div>
+        <span class="cap">dark / light / 32px</span>
+      </div>
+      <div class="swrow">
+        <div class="sw2"><span class="chip" style="background:#0C1420"></span><span class="name">Navy</span><code>#0C1420</code></div>
+        <div class="sw2"><span class="chip" style="background:#EDE8DE"></span><span class="name">Chalk</span><code>#EDE8DE</code></div>
+        <div class="sw2"><span class="chip" style="background:#E2A34C"></span><span class="name">Amber</span><code>#E2A34C</code></div>
+        <div class="sw2"><span class="chip" style="background:#7F8B99"></span><span class="name">Steel</span><code>#7F8B99</code></div>
+      </div>
+    </div>
+  </article>
+
+  <!-- 03 -->
+  <article class="opt" data-chosen style="--ink:#14121A;--card:#1A1722;--fg:#E9E5DD;--acc:#9B8AF0;--accLt:#6F5BD0;--mut:#89839A;border:1px solid rgba(155,138,240,.45)">
+    <div class="opt-head">
+      <div><span class="opt-num">03</span><h2>Charcoal &amp; <em>Iris</em><span class="chosen">chosen</span></h2></div>
+      <span class="opt-code">#14121A · #E9E5DD · #9B8AF0</span>
+    </div>
+    <p class="opt-desc"><b>The bridge.</b> If you don't actually want to walk away from the purple on ashy.lol, this is that purple grown up: desaturated to an iris, sitting on a warm charcoal rather than a neon-lit black. It keeps continuity with the site and Twitch without inheriting the default "gamer violet" glow, and the accent is muted enough to disappear on a busy thumbnail until you look for it.</p>
+    <div class="surfaces">
+      <div class="mini-banner">
+        <div class="wm"><span class="br">[</span>ashtyn<span class="br">]</span></div>
+        <div class="lbl">zombies<br>single-player<br>whatever's next</div>
+      </div>
+      <div class="mini-thumb">
+        <div class="art" style="--a:#221f2b;--b:#4a4170;--c:#08070b"></div>
+        <div class="title">It was<br>worth stealing</div>
+        <div class="tag"><span class="b"><span class="br">[</span>a<span class="br">]</span></span><span class="sep">/</span><span>Shorts</span></div>
+      </div>
+    </div>
+    <div class="opt-foot">
+      <div class="avs">
+        <div class="av"><div class="wm"><span class="br">[</span>a<span class="br">]</span></div></div>
+        <div class="av light"><div class="wm"><span class="br">[</span>a<span class="br">]</span></div></div>
+        <div class="av small"><div class="wm">a</div></div>
+        <span class="cap">dark / light / 32px</span>
+      </div>
+      <div class="swrow">
+        <div class="sw2"><span class="chip" style="background:#14121A"></span><span class="name">Charcoal</span><code>#14121A</code></div>
+        <div class="sw2"><span class="chip" style="background:#E9E5DD"></span><span class="name">Smoke</span><code>#E9E5DD</code></div>
+        <div class="sw2"><span class="chip" style="background:#9B8AF0"></span><span class="name">Iris</span><code>#9B8AF0</code></div>
+        <div class="sw2"><span class="chip" style="background:#89839A"></span><span class="name">Ash</span><code>#89839A</code></div>
+      </div>
+    </div>
+  </article>
+
+  <!-- 04 -->
+  <article class="opt" style="--ink:#0F0F0F;--card:#161616;--fg:#F1EFEB;--acc:#F1EFEB;--accLt:#0F0F0F;--mut:#8B8880">
+    <div class="opt-head">
+      <div><span class="opt-num">04</span><h2>No accent <em>at all</em></h2></div>
+      <span class="opt-code">#0F0F0F · #F1EFEB</span>
+    </div>
+    <p class="opt-desc"><b>Pure monochrome.</b> The brackets are still there, just in the same off-white as the name — shape does all the work, color does nothing. This is the quietest possible version and the one that will never clash with a single game, but recognizability drops: at chip size the tag becomes texture rather than a mark. Include it in your thinking as the floor, not the recommendation.</p>
+    <div class="surfaces">
+      <div class="mini-banner">
+        <div class="wm"><span class="br">[</span>ashtyn<span class="br">]</span></div>
+        <div class="lbl">zombies<br>single-player<br>whatever's next</div>
+      </div>
+      <div class="mini-thumb">
+        <div class="art" style="--a:#242424;--b:#4d4d4d;--c:#070707"></div>
+        <div class="title">Lobster got<br>scared</div>
+        <div class="tag"><span class="b"><span class="br">[</span>a<span class="br">]</span></span><span class="sep">/</span><span>Clips</span></div>
+      </div>
+    </div>
+    <div class="opt-foot">
+      <div class="avs">
+        <div class="av"><div class="wm"><span class="br">[</span>a<span class="br">]</span></div></div>
+        <div class="av light"><div class="wm"><span class="br">[</span>a<span class="br">]</span></div></div>
+        <div class="av small"><div class="wm">a</div></div>
+        <span class="cap">dark / light / 32px</span>
+      </div>
+      <div class="swrow">
+        <div class="sw2"><span class="chip" style="background:#0F0F0F"></span><span class="name">Black</span><code>#0F0F0F</code></div>
+        <div class="sw2"><span class="chip" style="background:#F1EFEB"></span><span class="name">Paper</span><code>#F1EFEB</code></div>
+        <div class="sw2"><span class="chip" style="background:#8B8880"></span><span class="name">Grey</span><code>#8B8880</code></div>
+      </div>
+    </div>
+  </article>
+
+  <section class="choose">
+    <h2>Locked: Charcoal &amp; Iris</h2>
+    <p><b style="color:var(--bone)">#14121A · #E9E5DD · #9B8AF0 · #6F5BD0 · #89839A</b> — these five tokens are now the brand's only colours, and the <a href="index.html" style="color:#9B8AF0">full board</a> has been rebuilt around them. The other three stay here as a record: if iris ever feels wrong in six months, swapping it means editing five values, not redesigning anything.</p>
+    <p>The trade this palette makes: it's the quietest accent of the four on a busy thumbnail, and iris almost disappears against a purple-heavy game UI. That's acceptable because the tag chip's shape carries it there — the accent is a detail you find on a second look, which is the brief.</p>
+    <div class="grid">
+      <div class="card"><strong>Test it against real art</strong><p>Screenshot three of your existing thumbnails and drop the tag chip onto each. If the accent gets lost on one of them, it's too close to that game's palette.</p></div>
+      <div class="card"><strong>Test it at chip size</strong><p>Zoom to 15%. If you can still tell the tag is yours, the accent is strong enough. If the whole chip turns into a grey smudge, it isn't.</p></div>
+      <div class="card"><strong>Only the accent moves</strong><p>Whatever you pick, the bracket colour is the one token that should never change per series. Neutral field, fixed accent, changing art.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <span>ashtyn · palette options</span>
+    <span>one accent, small dose</span>
+  </footer>
+</div>
+</body>
+</html>

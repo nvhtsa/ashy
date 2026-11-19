@@ -140,7 +140,7 @@ await writeFile(
 console.log(`[archive] ${entries.length} signatures`);
 console.log(`[archive] wrote ${htmlPath}`);
 
-const saveUrl = `https://web.archive.org/save/${siteUrl}guestbook`;
+const saveUrl = `https://web.archive.org/save/${siteUrl}`;
 console.log(`[archive] capture the live page too: ${saveUrl}`);
 
 if (wantWayback) {

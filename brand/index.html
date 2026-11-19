@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ashtyn — slime</title>
+<style>
+  :root{
+    --paper:#ffffff;
+    --ink:#12240f;
+    --body:#2b3a27;
+    --green:#4fae3c;
+    --green-d:#26601e;
+    --lime:#a4e454;
+    --blue:#5ccdec;
+    --mono:ui-monospace,"Cascadia Mono","SF Mono",Consolas,monospace;
+    --sans:"Bricolage Grotesque","Helvetica Neue",Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{background:#f4f8f1}
+  body{margin:0;color:var(--ink);font-family:var(--sans);background:var(--paper);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 clamp(18px,4vw,54px)}
+
+  header{padding:clamp(44px,7vh,86px) 0 clamp(24px,4vh,40px)}
+  .kick{font-family:var(--mono);font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--green-d);display:flex;gap:14px;flex-wrap:wrap}
+  .kick b{color:var(--lime);font-weight:400}
+  h1{font-size:clamp(56px,11vw,132px);line-height:.85;letter-spacing:-.045em;margin:16px 0 0;font-weight:700;color:var(--green-d)}
+  h1 em{font-style:normal;color:var(--green)}
+  .lede{margin:20px 0 0;max-width:56ch;font-size:clamp(16px,1.4vw,19px);line-height:1.5;color:var(--body)}
+
+  section{padding:clamp(28px,5vh,52px) 0;border-top:2px solid #e3eddd}
+  .no{font-family:var(--mono);font-size:11.5px;letter-spacing:.2em;color:var(--green);margin:0 0 8px}
+  h2{font-size:clamp(26px,3.2vw,40px);line-height:1.05;letter-spacing:-.03em;margin:0 0 14px;font-weight:700;max-width:26ch}
+  .body{max-width:62ch;font-size:clamp(15px,1.2vw,17px);line-height:1.55;color:var(--body);margin:0 0 14px}
+  .body strong{font-weight:700;color:var(--ink)}
+  .fine{font-family:var(--mono);font-size:12px;line-height:1.65;color:#5c6b57}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:6px}
+  .card{border:2px solid var(--green-d);border-radius:14px;background:#f7fbf3;padding:16px 16px 18px}
+  .card .i{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--green);margin-bottom:8px}
+  .card h3{margin:0 0 6px;font-size:15.5px}
+  .card p{margin:0;font-size:13.5px;line-height:1.5;color:var(--body)}
+
+  figure{margin:18px 0 0}
+  figure img{display:block;width:100%;height:auto;border-radius:10px;border:1px solid #dfe9d9;background:#fff}
+  figcaption{font-family:var(--mono);font-size:11.5px;color:#5c6b57;margin-top:8px}
+
+  .pair{display:grid;grid-template-columns:1.3fr .7fr;gap:14px;align-items:start}
+  @media (max-width:720px){.pair{grid-template-columns:1fr}}
+
+  ol.rules{margin:10px 0 0;padding:0;list-style:none;counter-reset:r}
+  ol.rules li{counter-increment:r;position:relative;padding:11px 0 11px 38px;border-bottom:1px solid #e3eddd;font-size:14.5px;line-height:1.5;color:var(--body)}
+  ol.rules li::before{content:counter(r,decimal-leading-zero);position:absolute;left:0;top:11px;font-family:var(--mono);font-size:11px;color:var(--green)}
+  ol.rules li b{font-weight:700;color:var(--ink)}
+
+  .swatches{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+  .sw{border-radius:10px;overflow:hidden;border:1px solid #dfe9d9}
+  .sw .chip{height:74px}
+  .sw .meta{padding:8px 10px;font-family:var(--mono);font-size:11px;line-height:1.5;color:#5c6b57;background:#fff}
+  .sw .meta b{display:block;color:var(--ink);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase}
+
+  table{width:100%;border-collapse:collapse;margin-top:10px;font-family:var(--mono);font-size:12px}
+  th,td{text-align:left;padding:9px;border-bottom:1px solid #e3eddd}
+  th{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#5c6b57;font-weight:400}
+  td span{color:#5c6b57}
+
+  footer{padding:24px 0 54px;border-top:2px solid #e3eddd;font-family:var(--mono);font-size:11.5px;color:#5c6b57;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <div class="kick">Brand direction <b>/</b> ashtyn <b>/</b> v6</div>
+  <h1>Sl<em>i</em>me.</h1>
+  <p class="lede">Green, wet, and growing over everything. The name is set in real display letterforms — not drawn by me — then inflated, glossed, and dropped into a habitat of vines, blue slime islands and stray droplets. White page, one organism.</p>
+</div></header>
+
+<section><div class="wrap">
+  <p class="no">00 — what changed</p>
+  <h2>Real letterforms, generated everything else</h2>
+  <p class="body">The last pass failed because I was drawing letters. Lettering is the one part of this that needs a designer's hand, so the wordmark is now set in <strong>Rubik Wet Paint</strong> — a display face whose forms already carry the bulges and drips — and everything around it is generated.</p>
+  <p class="body">That division matters: the typeface supplies the character, the code supplies the material. If the word ever changes, it is retyped, not redrawn.</p>
+</div></section>
+
+<section><div class="wrap">
+  <p class="no">01 — the system</p>
+  <h2>Three passes over one silhouette</h2>
+  <div class="cards">
+    <div class="card"><div class="i">01 / TYPE</div><h3>Rubik Wet Paint</h3><p>Chunky, condensed, dripping at the baseline. Stretched 12% vertically so it stands taller than the face's default.</p></div>
+    <div class="card"><div class="i">02 / MATERIAL</div><h3>Inflation</h3><p>A blurred copy of the silhouette acts as a height field; its gradient becomes a surface normal, lit from the top left. That is the whole plastic gloss.</p></div>
+    <div class="card"><div class="i">03 / HABITAT</div><h3>Growth</h3><p>Tapered vines, blue slime islands with their own drips, droplets thrown off the mass. All generated, all on the same white page.</p></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <p class="no">02 — the tag</p>
+  <h2>Where the name lives</h2>
+  <figure>
+    <img src="export/youtube-banner-slime-2560x1440.png" alt="Slime banner: ASHTYN in green dripping letters with blue slime and vines">
+    <figcaption>CHANNEL BANNER · 2560 × 1440 · letter mass fitted to the 1546 × 423 safe band</figcaption>
+  </figure>
+  <ol class="rules">
+    <li><b>The white page is the design.</b> No background art behind the letters beyond vines. Empty space is what makes the green read.</li>
+    <li><b>One outline.</b> Every letter and drip shares the same dark green edge — it is the outline of the whole organism, not of each letter.</li>
+    <li><b>Gloss follows the top edge only.</b> Highlights sit where the surface turns up, never in the middle of a flat counter.</li>
+    <li><b>Blue is punctuation.</b> Two or three slime islands per composition, never touching the wordmark's face.</li>
+  </ol>
+</div></section>
+
+<section><div class="wrap">
+  <p class="no">03 — palette</p>
+  <h2>Two greens and a warning blue</h2>
+  <div class="swatches">
+    <div class="sw"><div class="chip" style="background:#ffffff"></div><div class="meta"><b>Page</b>#FFFFFF</div></div>
+    <div class="sw"><div class="chip" style="background:#a4e454"></div><div class="meta"><b>Lime</b>#A4E454 · light</div></div>
+    <div class="sw"><div class="chip" style="background:#5cba3c"></div><div class="meta"><b>Slime</b>#5CBA3C · body</div></div>
+    <div class="sw"><div class="chip" style="background:#26601e"></div><div class="meta"><b>Deep</b>#26601E · shade</div></div>
+    <div class="sw"><div class="chip" style="background:#16401a"></div><div class="meta"><b>Edge</b>#16401A · outline</div></div>
+    <div class="sw"><div class="chip" style="background:#5ccdec"></div><div class="meta"><b>Blue</b>#5CCDEC · accent</div></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <p class="no">04 — other surfaces</p>
+  <h2>Same organism, smaller format</h2>
+  <div class="pair">
+    <figure style="margin-top:0">
+      <img src="export/twitch-banner-slime-1200x480.png" alt="Twitch panel in the same slime system">
+      <figcaption>TWITCH · 1200 × 480</figcaption>
+    </figure>
+    <figure style="margin-top:0">
+      <img src="export/profile-slime-800.png" alt="Avatar: slime A with blue droplet">
+      <figcaption>AVATAR · 1024 / 800 / 256</figcaption>
+    </figure>
+  </div>
+  <p class="body" style="margin-top:16px">The avatar drops to a single <strong>A</strong> and one blue island. At 32&nbsp;px the letterform and the green are all that survive — the gloss turns into noise, so it is dialled back rather than removed.</p>
+  <p class="body">The thumbnail template still runs the flat iris <b>a</b> tag from two directions ago. It does not match this set yet, and at 320&nbsp;px a slime wordmark will not survive anyway — thumbnails need their own treatment.</p>
+</div></section>
+
+<section><div class="wrap">
+  <p class="no">05 — files</p>
+  <h2>What ships</h2>
+  <table>
+    <thead><tr><th>File</th><th>Size</th><th>Where</th></tr></thead>
+    <tbody>
+      <tr><td>youtube-banner-slime-2560x1440.png</td><td>2560 × 1440</td><td><span>channel banner</span></td></tr>
+      <tr><td>twitch-banner-slime-1200x480.png</td><td>1200 × 480</td><td><span>twitch panel</span></td></tr>
+      <tr><td>profile-slime-1024 / 800 / 256.png</td><td>square</td><td><span>avatar, all platforms</span></td></tr>
+      <tr><td>watermark-150.png · -white.png</td><td>150</td><td><span>video corner mark</span></td></tr>
+      <tr><td>logo-transparent / white / black</td><td>1024</td><td><span>flat knock-outs</span></td></tr>
+      <tr><td>export/alt-ink · alt-cyber · alt-graff</td><td>—</td><td><span>earlier directions, kept</span></td></tr>
+    </tbody>
+  </table>
+  <p class="fine" style="margin-top:14px">Rebuild: <b>python brand/src/build_slime.py</b> (about 5s). Type: Rubik Wet Paint, Google Fonts, SIL Open Font License 1.1 — free for commercial use, no attribution required.</p>
+</div></section>
+
+<section><div class="wrap" style="border-top:none">
+  <p class="no">06 — open</p>
+  <h2>What this still isn’t</h2>
+  <p class="body">It is a generated interpretation of the reference, not a match for it. The shading is soft where that artwork is crisp vector; the drips come from a typeface rather than being drawn per letter; and the vines are noise-driven rather than composed. If the exact look matters, it needs an illustrator.</p>
+</div></section>
+
+<footer class="wrap"><span>ashtyn — slime · v6</span><span>type: Rubik Wet Paint (OFL) · build: build_slime.py</span></footer>
+
+</body>
+</html>

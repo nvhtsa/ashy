@@ -1,5 +1,5 @@
-// Guestbook view for ashy.lol. Reads window.SITE.guestbook from config.js and
-// talks to Supabase's REST API directly — no SDK, no server, nothing to keep alive.
+// Guestbook for ashy.lol — the only page left. Reads window.SITE.guestbook from
+// config.js and talks to Supabase's REST API directly: no SDK, no server.
 
 (() => {
   const C = (window.SITE && window.SITE.guestbook) || {};
@@ -9,6 +9,7 @@
   const live = Boolean(url && key);
   const deadline = new Date(C.expiresAt || "2027-01-16T23:59:59Z");
   const COOLDOWN = 60_000;
+  const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const $ = (id) => document.getElementById(id);
   const els = {
@@ -34,6 +35,7 @@
   const say = (text, bad) => {
     els.msg.textContent = text;
     els.msg.classList.toggle("bad", Boolean(bad));
+    els.msg.classList.toggle("ok", !bad && Boolean(text));
   };
 
   const stamp = (iso) =>
@@ -41,6 +43,17 @@
       day: "numeric", month: "short", year: "numeric",
       hour: "2-digit", minute: "2-digit", timeZone: "UTC",
     }).format(new Date(iso));
+
+  // A stable colour per signer, so the same name keeps the same avatar tile.
+  function tone(name) {
+    let h = 2166136261;
+    for (let i = 0; i < name.length; i++) { h ^= name.charCodeAt(i); h = Math.imul(h, 16777619); }
+    return 216 + ((h >>> 0) % 96);
+  }
+  function initials(name) {
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    return ((parts[0] || "?")[0] + (parts[1] ? parts[1][0] : "")).toUpperCase();
+  }
 
   function close() {
     closed = true;
@@ -52,10 +65,16 @@
 
   function tick() {
     const left = Math.max(0, deadline - Date.now());
+    const secs = pad(Math.floor(left / 1000) % 60);
     els.days.textContent = String(Math.floor(left / 86_400_000));
     els.hours.textContent = pad(Math.floor(left / 3_600_000) % 24);
     els.minutes.textContent = pad(Math.floor(left / 60_000) % 60);
-    els.seconds.textContent = pad(Math.floor(left / 1000) % 60);
+    if (els.seconds.textContent !== secs) {
+      els.seconds.textContent = secs;
+      if (!calm && !closed && els.seconds.animate) {
+        els.seconds.animate([{ opacity: .3 }, { opacity: 1 }], { duration: 460, easing: "ease-out" });
+      }
+    }
     if (left === 0 && !closed) close();
   }
 
@@ -73,34 +92,55 @@
       days: Math.max(0, Math.ceil((deadline - new Date(row.created_at)) / 86_400_000)),
     }));
 
-    els.list.replaceChildren(
-      ...entries.map((entry, index) => {
-        const li = document.createElement("li");
-        li.className = "gb-item";
+    if (!entries.length) {
+      const empty = document.createElement("li");
+      empty.className = "gb-empty";
+      empty.textContent = "Nobody yet. Be the first name on the wall.";
+      els.list.replaceChildren(empty);
+    } else {
+      els.list.replaceChildren(
+        ...entries.map((entry, index) => {
+          const li = document.createElement("li");
+          li.className = "gb-item";
+          li.style.setProperty("--i", String(Math.min(index, 12)));
+          li.style.setProperty("--h", String(tone(entry.name)));
 
-        const n = document.createElement("span");
-        n.className = "gb-n";
-        n.textContent = pad(entries.length - index);
+          const av = document.createElement("span");
+          av.className = "gb-av";
+          av.setAttribute("aria-hidden", "true");
+          av.textContent = initials(entry.name);
 
-        const body = document.createElement("div");
-        const msg = document.createElement("p");
-        msg.className = "gb-text";
-        msg.textContent = entry.message;
+          const body = document.createElement("div");
+          body.className = "gb-body";
 
-        const meta = document.createElement("p");
-        meta.className = "gb-by";
-        const who = document.createElement("span");
-        who.textContent = entry.name;
-        const tail = entry.days === 0
-          ? "signed on the last day"
-          : `signed ${entry.days} ${entry.days === 1 ? "day" : "days"} before the end`;
-        meta.append(who, ` · ${stamp(entry.createdAt)} UTC · ${tail}`);
+          const msg = document.createElement("p");
+          msg.className = "gb-text";
+          msg.textContent = entry.message;
 
-        body.append(msg, meta);
-        li.append(n, body);
-        return li;
-      }),
-    );
+          const meta = document.createElement("p");
+          meta.className = "gb-by";
+          const who = document.createElement("span");
+          who.textContent = entry.name;
+          const dot = () => {
+            const i = document.createElement("i");
+            i.textContent = "·";
+            return i;
+          };
+          const tail = entry.days === 0
+            ? "signed on the last day"
+            : `signed ${entry.days} ${entry.days === 1 ? "day" : "days"} before the end`;
+          meta.append(who, dot(), `${stamp(entry.createdAt)} UTC`, dot(), tail);
+
+          const num = document.createElement("span");
+          num.className = "gb-n";
+          num.textContent = "#" + pad(entries.length - index);
+
+          body.append(msg, meta);
+          li.append(av, body, num);
+          return li;
+        }),
+      );
+    }
 
     els.meta.textContent = entries.length
       ? `${entries.length} ${entries.length === 1 ? "signature" : "signatures"}, none permanent`
@@ -155,6 +195,7 @@
       els.chars.textContent = "0";
       say("Signed. It's temporary, like everything here.");
       await load();
+      els.list.firstElementChild?.scrollIntoView({ block: "nearest", behavior: calm ? "auto" : "smooth" });
     } catch {
       say("Network trouble. Try again in a moment.", true);
     } finally {
@@ -174,11 +215,11 @@
     });
     els.form.addEventListener("submit", sign);
 
-    if (live) load();
+    if (live) { els.meta.textContent = "reading the wall…"; load(); }
     else setupState();
   }
 
-  // The router hides and shows sections. Start when this view is first shown.
+  // app.js announces the view once; the page also starts itself on load.
   addEventListener("viewchange", (event) => {
     if (event.detail && event.detail.view === "guestbook") {
       start();

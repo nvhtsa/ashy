@@ -1,8 +1,7 @@
 # ashy.lol guestbook
 
-The guestbook is a view of the main site, not a separate page: it lives at `ashy.lol/guestbook`,
-shares the nav, background and styling, and is rendered by `guestbook.js` from the markup in
-`index.html`.
+The guestbook is the whole site now: `ashy.lol` serves it, and it is rendered by `guestbook.js`
+from the markup in `index.html`.
 
 This folder is tooling only. The leading underscore keeps it out of the published site.
 
@@ -48,4 +47,4 @@ everyone's wording once it is gone.
 | `archive.mjs` | Shutdown-day snapshot (Node 20.11+)                       |
 
 The client itself is `guestbook.js` at the site root, wired into `index.html` under
-`data-view="guestbook"` and registered in `app.js`'s `PAGE_NAMES`.
+`data-view="guestbook"`.

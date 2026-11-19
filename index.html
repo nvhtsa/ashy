@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=10" />
+  <link rel="stylesheet" href="styles.css?v=11" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="ashy, mwl" />
   <meta property="og:description" content="personal project" />
@@ -22,7 +22,7 @@
   <meta name="twitter:description" content="personal project" />
   <meta name="twitter:image" content="https://ashy.lol/assets/img/embed.png" />
 </head>
-<body data-view="home">
+<body data-view="guestbook">
   <button id="splash" class="splash" aria-label="Enter site"><canvas id="intro" aria-hidden="true"></canvas>
     <span class="cue" aria-hidden="true"><i class="ring"></i><b>enter</b></span></button>
 
@@ -35,53 +35,35 @@
   <div id="cursorGlow" class="cursor-glow" aria-hidden="true"></div>
 
   <div id="app" class="app">
-    <div id="bloom" class="bloom" aria-hidden="true"></div>
     <header class="top">
       <nav aria-label="Pages">
-        <a href="/">Home</a>
-        <a href="/gear">Gear</a>
-        <a href="/settings">Settings</a>
-        <a href="/listening">Listening</a>
-        <a href="/guestbook">Guestbook</a>
+        <a href="/" aria-current="page">Guestbook</a>
       </nav>
     </header>
 
     <main>
-      <section data-view="home" class="home">
-        <img class="logo" src="assets/img/logo.png" alt="Ashtyn" />
-        <div id="socials" class="socials"></div>
-      </section>
-
-      <section data-view="gear" hidden>
-        <h1>Gear</h1>
-        <p class="lede">PC Specs & Peripherals</p>
-        <div id="gearList" class="gear"></div>
-      </section>
-
-      <section data-view="settings" hidden>
-        <h1>Settings</h1>
-        <p class="lede">My game settings.</p>
-        <div id="settingsList" class="gear"></div>
-      </section>
-
-      <section data-view="listening" hidden>
-        <h1>Listening</h1>
-        <p class="lede" id="npLede"></p>
-        <div id="np" class="np"></div>
-        <div id="recent" class="recent"></div>
-      </section>
-      <section data-view="guestbook" hidden>
-        <h1>Guestbook</h1>
-        <p class="lede">Sign it before the domain goes. Every name here disappears with ashy.lol in January.</p>
+      <section data-view="guestbook" class="guestbook">
+        <header class="gb-hero">
+          <img class="logo gb-logo" src="assets/img/logo.png" alt="Ashtyn" />
+          <p class="gb-kicker">the last page</p>
+          <h1>Guestbook</h1>
+          <p class="lede">Sign it before the domain goes. Every name here disappears with ashy.lol in January.</p>
+          <div id="socials" class="socials"></div>
+        </header>
 
         <div class="gb-clock" id="gbClock" aria-label="Time left before the guestbook closes">
-          <div><b id="gbDays">—</b><span>days</span></div>
-          <div><b id="gbHours">—</b><span>hours</span></div>
-          <div><b id="gbMinutes">—</b><span>minutes</span></div>
-          <div><b id="gbSeconds">—</b><span>seconds</span></div>
+          <div class="gb-unit"><b id="gbDays">—</b><span>days</span></div>
+          <div class="gb-unit"><b id="gbHours">—</b><span>hours</span></div>
+          <div class="gb-unit"><b id="gbMinutes">—</b><span>minutes</span></div>
+          <div class="gb-unit"><b id="gbSeconds">—</b><span>seconds</span></div>
+          <p class="gb-clock-note">until the wall closes for good</p>
         </div>
 
         <form class="gb-form" id="gbForm" novalidate>
+          <div class="gb-form-head">
+            <h2>Sign the wall</h2>
+            <p>no account · no email · 280 characters</p>
+          </div>
           <div class="gb-row">
             <label for="gbName">Name <span>optional</span></label>
             <input id="gbName" type="text" maxlength="40" autocomplete="nickname" placeholder="anonymous" />
@@ -110,7 +92,7 @@
 
     <canvas id="viz" class="viz" aria-hidden="true"></canvas>
 
-    <a class="mark" href="/" aria-label="Back to home">ashtyn</a>
+    <a class="mark" href="/" aria-label="Ashtyn">ashtyn</a>
 
     <footer class="player" aria-label="Music player">
       <div id="pQueue" class="queue" role="list" aria-label="Tracklist"></div>
@@ -149,8 +131,8 @@
   <audio id="audio" preload="auto"></audio>
   <script src="config.js"></script>
   <script src="playlist.js?v=6cee7de1"></script>
-  <script src="app.js?v=ashtyn-cap-20"></script>
+  <script src="app.js?v=guestbook-1"></script>
   <script src="brand-animation.js?v=1"></script>
-  <script src="guestbook.js?v=2"></script>
+  <script src="guestbook.js?v=3"></script>
 </body>
 </html>
