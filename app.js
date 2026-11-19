@@ -423,67 +423,8 @@
   requestAnimationFrame(analyse);
 
 
-  function initIntro(canvas, still) {
-    const ctx = canvas.getContext("2d"), DPR = Math.min(2, devicePixelRatio || 1);
-    const rnd = (a, b) => a + Math.random() * (b - a);
-    let W, H, raf, flyAt = 0, last = performance.now(), mx = 0, my = 0, dead = false;
-    const sprite = document.createElement("canvas"); sprite.width = sprite.height = 128;
-    const sc = sprite.getContext("2d"), g = sc.createRadialGradient(64, 64, 0, 64, 64, 64);
-    g.addColorStop(0, "rgba(225,210,255,1)"); g.addColorStop(.25, "rgba(167,139,250,.7)");
-    g.addColorStop(.6, "rgba(109,61,240,.22)"); g.addColorStop(1, "rgba(109,61,240,0)");
-    sc.fillStyle = g; sc.fillRect(0, 0, 128, 128);
-    const resize = () => {
-      W = innerWidth; H = innerHeight; canvas.width = W * DPR; canvas.height = H * DPR;
-      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    };
-    addEventListener("resize", resize); resize();
-    const orbs = Array.from({ length: innerWidth < 600 ? 55 : 95 }, () => ({
-      x: rnd(-1.8, 1.8), y: rnd(-1.4, 1.4), z: rnd(.35, 1.8), s: rnd(.018, .06),
-      a: rnd(.45, 1), ph: rnd(0, 6.28), sp: rnd(.2, .6) }));
-    const towers = Array.from({ length: 9 }, (_, k) => ({
-      x: (k + .5) / 9 + rnd(-.03, .03), w: rnd(26, 58), h: rnd(.3, .78), ph: rnd(0, 6.28) }));
-    addEventListener("pointermove", (e) => { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; }, { passive: true });
-
-    function frame(now) {
-      if (dead) return;
-      const dt = Math.min(.05, (now - last) / 1000); last = now;
-      const t = still ? 0 : now / 1000, ft = flyAt ? (now - flyAt) / 1000 : 0, p = Math.min(1, ft / 1.1);
-      ctx.clearRect(0, 0, W, H);
-      ctx.globalCompositeOperation = "lighter";
-      const B = still ? 0 : fx.bass * .12, K = still ? 0 : fx.kick * .12;
-
-      const spread = 1 + p * p * 2.5;
-      towers.forEach((tw) => {
-        const w = tw.w * (1 + p * 2), h = tw.h * H * (1 + p) * (1 + B * .08), x = W / 2 + (tw.x - .5) * W * spread;
-        const al = (.16 + .08 * Math.sin(t * .8 + tw.ph)) * (1 - p) * (1 + B * 1.3 + K * .8);
-        const gr = ctx.createLinearGradient(0, H - h, 0, H);
-        gr.addColorStop(0, "rgba(139,92,246,0)"); gr.addColorStop(1, `rgba(139,92,246,${al * 2})`);
-        ctx.fillStyle = gr; ctx.fillRect(x - w / 2, H - h, w, h);
-      });
-
-      const speed = flyAt ? .35 + 9 * ft * ft + B * 1.5 : 0, out = Math.max(0, (ft - 1.4) / .6);
-      for (const o of orbs) {
-        if (!still) {
-          o.y -= dt * o.sp * .06 * (1 + B * 10); if (o.y < -1.5) o.y = 1.5;
-          o.x += Math.sin(t * o.sp + o.ph) * dt * .03;
-        }
-        if (flyAt) o.z -= dt * speed;
-        if (o.z < .06) continue;
-        const k = 1 / o.z, r = o.s * k * Math.min(W, H) * 1.6 * (1 + B * .8 + K * .5);
-        const px = W / 2 + (o.x - mx * .3) * k * W * .22, py = H / 2 + (o.y - my * .3) * k * H * .22;
-        if (px < -r || px > W + r || py < -r || py > H + r) continue;
-        const near = Math.min(1, (o.z - .06) / .2), far = Math.min(1, (2.2 - o.z) / .5);
-        ctx.globalAlpha = Math.min(1, Math.max(0, o.a * (.6 + .4 * Math.sin(t * o.sp * 2 + o.ph)) * (.8 + B * .7 + K * .5) * near * far * (1 - out)));
-        ctx.drawImage(sprite, px - r, py - r, r * 2, r * 2);
-      }
-      ctx.globalAlpha = 1;
-      raf = requestAnimationFrame(frame);
-    }
-    raf = requestAnimationFrame(frame);
-    return { fly: () => (flyAt = performance.now()), stop: () => { dead = true; cancelAnimationFrame(raf); } };
-  }
-
   function initOrbs(canvas, still) {
+
     const ctx = canvas.getContext("2d"), DPR = Math.min(2, devicePixelRatio || 1);
     const rnd = (a, b) => a + Math.random() * (b - a);
     let W, H, last = performance.now();
@@ -542,17 +483,4 @@
     })();
   })();
 
-  const intro = initIntro($("#intro"), calm);
-  let opened = false;
-  $("#splash").onclick = () => {
-    if (opened) return; opened = true;
-    startMusic();
-    $("#splash").classList.add("go");
-    intro.fly();
-    setTimeout(() => {
-      $("#splash").classList.add("gone"); $("#app").classList.add("in");
-      replay(view);
-      setTimeout(intro.stop, 1200);
-    }, calm ? 0 : 850);
-  };
 })();
